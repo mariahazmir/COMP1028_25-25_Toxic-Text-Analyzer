@@ -52,13 +52,104 @@ void removePunctuation(char str[]) {
 	str[j] = '\0';
 }
 
-void tokenizeText(char str[], const char* delimiters) {
+int isUnique(char token[], char uniqueWords[][50], int uniqueCount) {
+	for (int i = 0; i < uniqueCount; i++) {
+		if (strcmp(token, uniqueWords[i]) == 0) {
+			return 0; // not unique
+		}
+	}
+	return 1; // unique
+}
+
+void tokenizeText(char str[], const char* delimiters,
+	char uniqueWords[][50], int* uniqueCount,
+	char stopwords[][50], int stopwordCount) {
+
 	char* token = strtok(str, delimiters);
+
 	while (token != NULL) {
-		printf("%s\n", token);
+
+		// check stopword
+		if (!isStopword(token, stopwords, stopwordCount)) {
+
+			// check uniqueness
+			if (isUnique(token, uniqueWords, *uniqueCount)) {
+				strcpy(uniqueWords[*uniqueCount], token);
+				(*uniqueCount)++;
+			}
+		}
+
 		token = strtok(NULL, delimiters);
 	}
 }
+
+
+int loadStopwords(char stopwords[][50]) { //Load stopwords from stopwords.txt
+	FILE* f = fopen("stopwords.txt", "r");
+	if (!f) {
+		printf("Cannot open stopwords.txt\n");
+		return 0;
+	}
+
+	int count = 0;
+	while (fscanf(f, "%s", stopwords[count]) != EOF) {
+		count++;
+	}
+	fclose(f);
+
+	return count; // return how many stopwords were loaded
+}
+
+int isStopword(char* word, char stopwords[][50], int stopwordCount) { //Create a function to check if a word is a stopword
+	for (int i = 0; i < stopwordCount; i++) {
+		if (strcmp(word, stopwords[i]) == 0) {
+			return 1; // It is a stopword
+		}
+	}
+	return 0; // Not a stopword
+}
+
+double calculateAverageWordLength(char str[]) { //Function to calculate average word length
+	int letters = 0;
+	int words = 0;
+	int inWord = 0;
+
+	for (int i = 0; str[i] != '\0'; i++) {
+		if (str[i] != ' ') {    // count letters
+			letters++;
+			if (!inWord) {      // new word starts
+				words++;
+				inWord = 1;
+			}
+		}
+		else {
+			inWord = 0;          // space = end of a word
+		}
+	}
+
+	if (words == 0) return 0.0;
+	return (double)letters / words;
+}
+
+void storeWords(char* line, const char* delimiters, char words[][50], int* wordCount,
+	char stopwords[][50], int stopwordCount) {
+	char copy[BUFFER_SIZE];
+	strcpy(copy, line);
+
+	char* token = strtok(copy, delimiters);
+
+	while (token != NULL) {
+		if (!isStopword(token, stopwords, stopwordCount)) {  // Only non-stopwords
+			if (isUnique(token, words, *wordCount)) {       // Only add if unique
+				strcpy(words[*wordCount], token);
+				(*wordCount)++;
+			}
+		}
+		token = strtok(NULL, delimiters);
+	}
+}
+
+
 
 int main() {
 
@@ -69,12 +160,26 @@ int main() {
 	int wordcount;
 	int inword;
 	int currentColumn;
+	char uniqueWords[1000][50];
+	int uniqueCount = 0;
+	char stopwords[200][50];  // max 200 stopwords
+	int stopwordCount = loadStopwords(stopwords);
+	int totalLetters = 0;
+	int totalWords = 0;
+	int inWord = 0;
+	char cleanedText[50000] = "";
+	char words[2000][50];
+	int wordCount = 0;
+
 
 	printf("How many files do you want to read?\n");
 	scanf("%d", &numFiles);
 
 	for (int i = 0; i < numFiles; i++) {
 
+		wordCount = 0;
+		uniqueCount = 0;
+		cleanedText[0] = '\0';  // empty string
 
 		printf("Enter the name of file %d:\n", i + 1);
 		scanf("%s", fileName);
@@ -116,12 +221,44 @@ int main() {
 
 			normalizeCase(line);        // Convert the line to lowercase first
 			removePunctuation(line);
-			tokenizeText(line, delims); // Tokenize and print
+			storeWords(line, delims, words, &wordCount, stopwords, stopwordCount);
+			// Add cleaned line to big text buffer
+			strcat(cleanedText, line);
+			strcat(cleanedText, " ");   // space between lines
+			tokenizeText(line, delims, uniqueWords, &uniqueCount, stopwords, stopwordCount);
+
 		}
+
 
 		// Now wordcount has the total words in the whole file
 		printf("\nTotal words: %d\n", wordcount);
+		printf("\nUnique words (excluding stopwords):\n");
+		for (int i = 0; i < uniqueCount; i++) {
+			printf("%s\n", uniqueWords[i]);
+		}
 
+		double avg = calculateAverageWordLength(cleanedText);
+		printf("Average word length for entire file: %.2f\n", avg);
+
+		double lexicalDiversity = 0.0;
+		if (wordcount > 0) {
+			lexicalDiversity = (double)uniqueCount / wordcount;
+		}
+		printf("Lexical Diversity Index: %.4f\n", lexicalDiversity);
+
+
+		FILE* out = fopen("filtered_words.txt", "w");
+		if (out == NULL) {
+			printf("Cannot create filtered_words.txt\n");
+		}
+
+		for (int i = 0; i < wordCount; i++) {
+			fprintf(out, "%s\n", words[i]);
+		}
+
+		fclose(out);
+		printf("Filtered words saved to filtered_words.txt\n");
+		
 		fclose(file);
 
 		//return 1;
