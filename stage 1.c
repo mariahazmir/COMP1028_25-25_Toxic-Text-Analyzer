@@ -1,271 +1,372 @@
 #define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
-#include <direct.h> 
-#include <string.h>  
-#define BUFFER_SIZE 5000 
+#include <string.h>
+#include <ctype.h>
 
-void processCharacter( //stage 1 function
-	char ch,
-	int isCSV,
-	int columnToRead,
-	int* currentColumn,
-	int* inword,
-	int* wordcount
-) {
+#define BUFFER_SIZE 5000
+#define MAX_WORDS 2000
+#define MAX_UNIQUE 1000
+#define MAX_STOPWORDS 200
+#define MAX_TOXIC 200
 
-	if (isCSV && ch == ',') {
-		(*currentColumn)++;
-		*inword = 0;
-	}
-	else if (ch == '\n') {
-		*currentColumn = 1;
-		*inword = 0;
-	}
-	else if (isCSV && *currentColumn != columnToRead) {
-		// Skip entire character if not in the column
-		return;
-	}
-	else if (ch == ' ' || ch == '\t') {
-		*inword = 0;
-	}
-	else if (*inword == 0) {
-		*inword = 1;
-		(*wordcount)++;
-	}
-}
+// ---------------- Utility Functions ----------------
 
 void normalizeCase(char str[]) {
-	for (int i = 0; str[i] != '\0'; i++) {
-		if (str[i] >= 'A' && str[i] <= 'Z') {
-			str[i] = str[i] + ('a' - 'A'); // convert uppercase to lowercase
-		}
-	}
+    for (int i = 0; str[i]; i++)
+        str[i] = tolower((unsigned char)str[i]);
 }
 
 void removePunctuation(char str[]) {
-	int i, j = 0;
-	for (i = 0; str[i] != '\0'; i++) {
-		if ((str[i] >= 'a' && str[i] <= 'z') || (str[i] >= '0' && str[i] <= '9') || str[i] == ' ') {
-			str[j++] = str[i];
-		}
-	}
-	str[j] = '\0';
+    int j = 0;
+    for (int i = 0; str[i]; i++) {
+        if (isalnum((unsigned char)str[i]) || str[i] == ' ')
+            str[j++] = str[i];
+    }
+    str[j] = '\0';
 }
 
 int isUnique(char token[], char uniqueWords[][50], int uniqueCount) {
-	for (int i = 0; i < uniqueCount; i++) {
-		if (strcmp(token, uniqueWords[i]) == 0) {
-			return 0; // not unique
-		}
-	}
-	return 1; // unique
+    for (int i = 0; i < uniqueCount; i++)
+        if (strcmp(token, uniqueWords[i]) == 0) return 0;
+    return 1;
 }
 
-void tokenizeText(char str[], const char* delimiters,
-	char uniqueWords[][50], int* uniqueCount,
-	char stopwords[][50], int stopwordCount) {
+int loadWordsFromFile(const char* filename, char words[][50]) {
+    FILE* f = fopen(filename, "r");
+    if (!f) {
+        printf("Cannot open %s\n", filename);
+        return 0;
+    }
+    int count = 0;
+    while (fscanf(f, "%s", words[count]) != EOF)
+        count++;
+    fclose(f);
+    return count;
+}
 
-	char* token = strtok(str, delimiters);
+int isStopword(char* word, char stopwords[][50], int stopwordCount) {
+    for (int i = 0; i < stopwordCount; i++)
+        if (strcmp(word, stopwords[i]) == 0) return 1;
+    return 0;
+}
 
-	while (token != NULL) {
+// Cross-platform case-insensitive string comparison
+int stringEqualsIgnoreCase(const char* a, const char* b) {
+    while (*a && *b) {
+        if (tolower((unsigned char)*a) != tolower((unsigned char)*b))
+            return 0;
+        a++;
+        b++;
+    }
+    return *a == *b;
+}
 
-		// check stopword
-		if (!isStopword(token, stopwords, stopwordCount)) {
+int isToxic(char* word, char toxicWords[][50], int toxicCount) {
+    for (int i = 0; i < toxicCount; i++)
+        if (stringEqualsIgnoreCase(word, toxicWords[i]))
+            return 1;
+    return 0;
+}
 
-			// check uniqueness
-			if (isUnique(token, uniqueWords, *uniqueCount)) {
-				strcpy(uniqueWords[*uniqueCount], token);
-				(*uniqueCount)++;
-			}
-		}
+// Store unique non-stopwords
+void storeUniqueWords(char* line, char words[][50], int* wordCount,
+    char uniqueWords[][50], int* uniqueCount,
+    char stopwords[][50], int stopwordCount) {
+    char copy[BUFFER_SIZE];
+    strcpy(copy, line);
 
-		token = strtok(NULL, delimiters);
-	}
+    char* token = strtok(copy, " \t\n,.:;!?\"'");
+    while (token != NULL) {
+        normalizeCase(token);
+        removePunctuation(token);
+
+        if (strlen(token) > 0 && !isStopword(token, stopwords, stopwordCount)) {
+            if (isUnique(token, uniqueWords, *uniqueCount)) {
+                strcpy(uniqueWords[*uniqueCount], token);
+                (*uniqueCount)++;
+            }
+            strcpy(words[*wordCount], token);
+            (*wordCount)++;
+        }
+        token = strtok(NULL, " \t\n,.:;!?\"'");
+    }
+}
+
+double calculateAverageWordLength(char words[][50], int wordCount) {
+    int totalLetters = 0;
+    for (int i = 0; i < wordCount; i++)
+        totalLetters += strlen(words[i]);
+    return wordCount ? (double)totalLetters / wordCount : 0.0;
+}
+
+void bubbleSortWords(char words[][50], int count) {
+    char temp[50];
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - i - 1; j++) {
+            if (strcmp(words[j], words[j + 1]) > 0) {
+                // Swap words[j] and words[j+1]
+                strcpy(temp, words[j]);
+                strcpy(words[j], words[j + 1]);
+                strcpy(words[j + 1], temp);
+            }
+        }
+    }
+}
+
+void bubbleSortToxicByFrequency(char toxicWords[][50], int toxicFreq[], int toxicCount) {
+    char tempWord[50];
+    int tempFreq;
+    for (int i = 0; i < toxicCount - 1; i++) {
+        for (int j = 0; j < toxicCount - i - 1; j++) {
+            if (toxicFreq[j] < toxicFreq[j + 1]) { // descending frequency
+                // Swap frequency
+                tempFreq = toxicFreq[j];
+                toxicFreq[j] = toxicFreq[j + 1];
+                toxicFreq[j + 1] = tempFreq;
+                // Swap words
+                strcpy(tempWord, toxicWords[j]);
+                strcpy(toxicWords[j], toxicWords[j + 1]);
+                strcpy(toxicWords[j + 1], tempWord);
+            }
+        }
+    }
+}
+
+// ------------top N frequent words-------------
+
+//Step 1: Count word frequencies
+typedef struct {
+    char word[50];
+    int freq;
+} WordFreq;
+
+void countWordFrequencies(char words[][50], int wordCount, WordFreq wordFreqs[], int* uniqueCount) {
+    *uniqueCount = 0;
+    for (int i = 0; i < wordCount; i++) {
+        int found = 0;
+        for (int j = 0; j < *uniqueCount; j++) {
+            if (strcmp(words[i], wordFreqs[j].word) == 0) {
+                wordFreqs[j].freq++;
+                found = 1;
+                break;
+            }
+        }
+        if (!found) {
+            strcpy(wordFreqs[*uniqueCount].word, words[i]);
+            wordFreqs[*uniqueCount].freq = 1;
+            (*uniqueCount)++;
+        }
+    }
+}
+
+//Step 2: Sort by frequency (descending)
+void bubbleSortByFrequency(WordFreq wordFreqs[], int count) {
+    WordFreq temp;
+    for (int i = 0; i < count - 1; i++) {
+        for (int j = 0; j < count - i - 1; j++) {
+            if (wordFreqs[j].freq < wordFreqs[j + 1].freq) {
+                temp = wordFreqs[j];
+                wordFreqs[j] = wordFreqs[j + 1];
+                wordFreqs[j + 1] = temp;
+            }
+        }
+    }
+}
+
+//Step 3: Display top N words
+void displayTopNWords(WordFreq wordFreqs[], int uniqueCount, int N) {
+    if (N > uniqueCount) N = uniqueCount;
+    printf("\nTop %d frequent words:\n", N);
+    for (int i = 0; i < N; i++) {
+        printf("%s: %d times\n", wordFreqs[i].word, wordFreqs[i].freq);
+    }
+}
+
+// ----------another sorting method-(Quick)--------
+void swapWords(char a[50], char b[50]) {
+    char temp[50];
+    strcpy(temp, a);
+    strcpy(a, b);
+    strcpy(b, temp);
+}
+
+int partition(char words[][50], int low, int high) {
+    char* pivot = words[high];
+    int i = low - 1;
+
+    for (int j = low; j < high; j++) {
+        if (strcmp(words[j], pivot) < 0) {  // alphabetical order
+            i++;
+            swapWords(words[i], words[j]);
+        }
+    }
+    swapWords(words[i + 1], words[high]);
+    return i + 1;
+}
+
+void quickSortWords(char words[][50], int low, int high) {
+    if (low < high) {
+        int pi = partition(words, low, high);
+        quickSortWords(words, low, pi - 1);
+        quickSortWords(words, pi + 1, high);
+    }
 }
 
 
-int loadStopwords(char stopwords[][50]) { //Load stopwords from stopwords.txt
-	FILE* f = fopen("stopwords.txt", "r");
-	if (!f) {
-		printf("Cannot open stopwords.txt\n");
-		return 0;
-	}
 
-	int count = 0;
-	while (fscanf(f, "%s", stopwords[count]) != EOF) {
-		count++;
-	}
-	fclose(f);
-
-	return count; // return how many stopwords were loaded
-}
-
-int isStopword(char* word, char stopwords[][50], int stopwordCount) { //Create a function to check if a word is a stopword
-	for (int i = 0; i < stopwordCount; i++) {
-		if (strcmp(word, stopwords[i]) == 0) {
-			return 1; // It is a stopword
-		}
-	}
-	return 0; // Not a stopword
-}
-
-double calculateAverageWordLength(char str[]) { //Function to calculate average word length
-	int letters = 0;
-	int words = 0;
-	int inWord = 0;
-
-	for (int i = 0; str[i] != '\0'; i++) {
-		if (str[i] != ' ') {    // count letters
-			letters++;
-			if (!inWord) {      // new word starts
-				words++;
-				inWord = 1;
-			}
-		}
-		else {
-			inWord = 0;          // space = end of a word
-		}
-	}
-
-	if (words == 0) return 0.0;
-	return (double)letters / words;
-}
-
-void storeWords(char* line, const char* delimiters, char words[][50], int* wordCount,
-	char stopwords[][50], int stopwordCount) {
-	char copy[BUFFER_SIZE];
-	strcpy(copy, line);
-
-	char* token = strtok(copy, delimiters);
-
-	while (token != NULL) {
-		if (!isStopword(token, stopwords, stopwordCount)) {  // Only non-stopwords
-			if (isUnique(token, words, *wordCount)) {       // Only add if unique
-				strcpy(words[*wordCount], token);
-				(*wordCount)++;
-			}
-		}
-		token = strtok(NULL, delimiters);
-	}
-}
-
-
+// ---------------- Main Program ----------------
 
 int main() {
+    char stopwords[MAX_STOPWORDS][50];
+    int stopwordCount = loadWordsFromFile("stopwords.txt", stopwords);
 
-	int numFiles;
-	char fileName[260]; //260 is max path length in windows
-	const char* delims = " ,.!?\n";  // delimiters including newline
-	char line[BUFFER_SIZE];
-	int wordcount;
-	int inword;
-	int currentColumn;
-	char uniqueWords[1000][50];
-	int uniqueCount = 0;
-	char stopwords[200][50];  // max 200 stopwords
-	int stopwordCount = loadStopwords(stopwords);
-	int totalLetters = 0;
-	int totalWords = 0;
-	int inWord = 0;
-	char cleanedText[50000] = "";
-	char words[2000][50];
-	int wordCount = 0;
+    char toxicWords[MAX_TOXIC][50];
+    int toxicCount = loadWordsFromFile("toxicwords.txt", toxicWords);
+
+    // --- Add new toxic words ---
+    char choice, newWord[50];
+    printf("Do you want to add new toxic words? (y/n): ");
+    scanf(" %c", &choice);
+    while (choice == 'y' || choice == 'Y') {
+        printf("Enter new toxic word: ");
+        scanf("%s", newWord);
+
+        int exists = 0;
+        for (int i = 0; i < toxicCount; i++)
+            if (stringEqualsIgnoreCase(newWord, toxicWords[i])) { exists = 1; break; }
+
+        if (!exists) {
+            strcpy(toxicWords[toxicCount++], newWord);
+            FILE* f = fopen("toxicwords.txt", "a");
+            if (f) { fprintf(f, "%s\n", newWord); fclose(f); }
+            printf("'%s' added.\n", newWord);
+        }
+        else {
+            printf("'%s' already exists.\n", newWord);
+        }
+
+        printf("Add another? (y/n): ");
+        scanf(" %c", &choice);
+    }
+
+    int numFiles;
+    printf("How many files to read? ");
+    scanf("%d", &numFiles);
+
+    for (int i = 0; i < numFiles; i++) {
+        char fileName[260];
+        printf("Enter filename %d: ", i + 1);
+        scanf("%s", fileName);
+
+        FILE* file = fopen(fileName, "r");
+        if (!file) { printf("Cannot open %s\n", fileName); i--; continue; }
+
+        printf("\n--- Reading %s ---\n", fileName);
+
+        char line[BUFFER_SIZE];
+        char words[MAX_WORDS][50];
+        int wordCount = 0;
+        char uniqueWords[MAX_UNIQUE][50];
+        int uniqueCount = 0;
+        int toxicFreq[MAX_TOXIC] = { 0 };
+        int totalWords = 0;
+        int totalToxicWords = 0;
+
+        // --- Read lines and tokenize ---
+        while (fgets(line, sizeof(line), file)) {
+            storeUniqueWords(line, words, &wordCount, uniqueWords, &uniqueCount,
+                stopwords, stopwordCount);
+        }
+        totalWords = wordCount;
+
+        // --- Detect toxic words ---
+        for (int w = 0; w < wordCount; w++) {
+            for (int t = 0; t < toxicCount; t++) {
+                if (stringEqualsIgnoreCase(words[w], toxicWords[t])) {
+                    toxicFreq[t]++;
+                    totalToxicWords++;
+                }
+            }
+        }
+
+        // --- Step 1: Gather toxic words that actually appear ---
+        WordFreq toxicWordFreqs[MAX_TOXIC];
+        int toxicFreqCount = 0;
+        for (int t = 0; t < toxicCount; t++) {
+            if (toxicFreq[t] > 0) {
+                strcpy(toxicWordFreqs[toxicFreqCount].word, toxicWords[t]);
+                toxicWordFreqs[toxicFreqCount].freq = toxicFreq[t];
+                toxicFreqCount++;
+            }
+        }
+
+        // --- Step 2: Sort toxic words by frequency ---
+        bubbleSortByFrequency(toxicWordFreqs, toxicFreqCount);
+
+        // --- Step 3: Display top N toxic words ---
+        if (toxicFreqCount > 0) {
+            int N_toxic;
+            printf("\nHow many top toxic words to display? ");
+            scanf("%d", &N_toxic);
+            displayTopNWords(toxicWordFreqs, toxicFreqCount, N_toxic);
+        }
+        else {
+            printf("\nNo toxic words found.\n");
+        }
+
+        // --- General statistics ---
+        printf("\nTotal words: %d\n", totalWords);
+        printf("Unique words (excluding stopwords): %d\n", uniqueCount);
+        printf("Average word length: %.2f\n", calculateAverageWordLength(words, wordCount));
+        double lexDiv = totalWords ? (double)uniqueCount / totalWords : 0.0;
+        printf("Lexical Diversity Index: %.4f\n", lexDiv);
+
+        // --- Words sorted alphabetically (Quick Sort) ---
+        quickSortWords(words, 0, wordCount - 1);
+        printf("\nWords sorted alphabetically (Quick Sort):\n");
+        for (int w = 0; w < wordCount; w++)
+            printf("%s\n", words[w]);
+
+        // --- Toxic words sorted by frequency ---
+        printf("\nToxic words sorted by frequency:\n");
+        for (int t = 0; t < toxicCount; t++) {
+            if (toxicFreq[t] > 0) {
+                double perc = ((double)toxicFreq[t] / totalWords) * 100;
+                printf("%s: %d times (%.2f%%)\n", toxicWords[t], toxicFreq[t], perc);
+            }
+        }
+        printf("Total toxic words: %d / %d words (%.2f%%)\n",
+            totalToxicWords, totalWords,
+            totalWords ? ((double)totalToxicWords / totalWords) * 100 : 0.0);
+
+        // Calculate toxic vs non-toxic ratios
+        double toxicRatio = totalWords ? (double)totalToxicWords / totalWords * 100 : 0.0;
+        double nonToxicRatio = totalWords ? (double)(totalWords - totalToxicWords) / totalWords * 100 : 0.0;
+
+        printf("\n--- Extra Summary Stats ---\n");
+        printf("Toxic words ratio: %.2f%%\n", toxicRatio);
+        printf("Non-toxic words ratio: %.2f%%\n", nonToxicRatio);
 
 
-	printf("How many files do you want to read?\n");
-	scanf("%d", &numFiles);
+        // --- Save filtered words ---
+        FILE* out = fopen("filtered_words.txt", "w");
+        if (out) {
+            for (int w = 0; w < wordCount; w++)
+                fprintf(out, "%s\n", words[w]);
+            fclose(out);
+            printf("Filtered words saved to filtered_words.txt\n");
+        }
 
-	for (int i = 0; i < numFiles; i++) {
+        // --- Top N frequent words ---
+        WordFreq wordFreqs[MAX_WORDS];
+        int uniqueFreqCount = 0;
+        countWordFrequencies(words, wordCount, wordFreqs, &uniqueFreqCount);
+        bubbleSortByFrequency(wordFreqs, uniqueFreqCount);
+        int N = 10;
+        displayTopNWords(wordFreqs, uniqueFreqCount, N);
 
-		wordCount = 0;
-		uniqueCount = 0;
-		cleanedText[0] = '\0';  // empty string
+        fclose(file);
+    }
 
-		printf("Enter the name of file %d:\n", i + 1);
-		scanf("%s", fileName);
-
-		FILE* file = fopen(fileName, "r");
-
-		if (file == NULL) {
-			printf("Error opening file: %s\n", fileName);
-			i--;          // retry the same file
-			continue;
-		}
-
-		printf("\n--- Reading %s ---\n", fileName);
-	
-
-		// Check csv files
-		char* extension = strrchr(fileName, '.');
-		int isCSV = (extension != NULL && strcmp(extension, ".csv") == 0);
-		int columnToRead = 0;
-
-		if (isCSV) {
-			printf("Which column number to analyze? (1, 2, 3, etc.): ");
-			scanf("%d", &columnToRead);
-		}
-	
-		// Reading and word counting
-		
-
-		wordcount = 0;
-
-		while (fgets(line, sizeof(line), file)) {
-			inword = 0;
-			currentColumn = 1;
-
-			// Count words manually using processCharacter
-			for (int j = 0; line[j] != '\0'; j++) {
-				processCharacter(line[j], isCSV, columnToRead, &currentColumn, &inword, &wordcount);
-			}
-
-			normalizeCase(line);        // Convert the line to lowercase first
-			removePunctuation(line);
-			storeWords(line, delims, words, &wordCount, stopwords, stopwordCount);
-			// Add cleaned line to big text buffer
-			strcat(cleanedText, line);
-			strcat(cleanedText, " ");   // space between lines
-			tokenizeText(line, delims, uniqueWords, &uniqueCount, stopwords, stopwordCount);
-
-		}
-
-
-		// Now wordcount has the total words in the whole file
-		printf("\nTotal words: %d\n", wordcount);
-		printf("\nUnique words (excluding stopwords):\n");
-		for (int i = 0; i < uniqueCount; i++) {
-			printf("%s\n", uniqueWords[i]);
-		}
-
-		double avg = calculateAverageWordLength(cleanedText);
-		printf("Average word length for entire file: %.2f\n", avg);
-
-		double lexicalDiversity = 0.0;
-		if (wordcount > 0) {
-			lexicalDiversity = (double)uniqueCount / wordcount;
-		}
-		printf("Lexical Diversity Index: %.4f\n", lexicalDiversity);
-
-
-		FILE* out = fopen("filtered_words.txt", "w");
-		if (out == NULL) {
-			printf("Cannot create filtered_words.txt\n");
-		}
-
-		for (int i = 0; i < wordCount; i++) {
-			fprintf(out, "%s\n", words[i]);
-		}
-
-		fclose(out);
-		printf("Filtered words saved to filtered_words.txt\n");
-		
-		fclose(file);
-
-		//return 1;
-	}
-
-
-	//fopen() - open file
-	//fgets() - read string form file
-	//fclose() - close file
+    return 0;
 }
