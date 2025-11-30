@@ -42,6 +42,15 @@ void removePunctuation(char str[]) {
     str[j] = '\0';
 }
 
+void removeNonASCII(char str[]) {
+    int j = 0;
+    for (int i = 0; str[i]; i++) {
+        if ((unsigned char)str[i] <= 127)
+            str[j++] = str[i];
+    }
+    str[j] = '\0';
+}
+
 int isUnique(char token[], char uniqueWords[][50], int uniqueCount) {
     for (int i = 0; i < uniqueCount; i++)
         if (strcmp(token, uniqueWords[i]) == 0) return 0;
@@ -97,6 +106,7 @@ void storeUniqueWords(char* line, char words[][50], int* wordCount,
     while (token != NULL) {
         normalizeCase(token);
         removePunctuation(token);
+        removeNonASCII(token);
 
         if (strlen(token) > 0 && !isStopword(token, stopwords, stopwordCount)) {
             if (isUnique(token, uniqueWords, *uniqueCount)) {
@@ -188,6 +198,26 @@ void addToxicWordsMenu() {
     }
 }
 
+void reloadDictionaries() {
+    stopwordCount = loadWordsFromFile("stopwords.txt", stopwords);
+    toxicCount = loadWordsFromFile("toxicwords.txt", toxicWords);
+
+    // Reset toxic frequencies
+    for (int i = 0; i < MAX_TOXIC; i++)
+        toxicFreq[i] = 0;
+
+    printf("\nDictionaries reloaded successfully!\n");
+    printf("Stopwords loaded: %d\n", stopwordCount);
+    printf("Toxic words loaded: %d\n", toxicCount);
+    if (stopwordCount == 0)
+        printf("⚠ WARNING: stopwords.txt is empty or missing.\n");
+
+    if (toxicCount == 0)
+        printf("⚠ WARNING: toxicwords.txt is empty or missing.\n");
+
+}
+
+
 // ---------------- File Analysis ----------------
 
 void readAndAnalyzeFileMenu() {
@@ -196,7 +226,16 @@ void readAndAnalyzeFileMenu() {
     scanf("%s", fileName);
 
     FILE* file = fopen(fileName, "r");
-    if (!file) { printf("Cannot open %s\n", fileName); return; }
+    if (!file) {
+        printf("\n❌ ERROR: Unable to open file: '%s'\n", fileName);
+        printf("Possible reasons:\n");
+        printf(" - The file does not exist\n");
+        printf(" - The file name is typed incorrectly\n");
+        printf(" - The file is not in the same folder as the program\n");
+        printf("Please try again.\n\n");
+
+        return; // go back to menu safely
+    }
 
     // Reset counters
     wordCount = uniqueCount = totalWords = totalToxicWords = 0;
@@ -232,6 +271,12 @@ void saveReportMenu() {
     FILE* report = fopen("analysis_report.txt", "w");
     if (!report) { printf("Cannot open analysis_report.txt\n"); return; }
 
+    if (totalWords == 0) {
+        printf("❌ ERROR: No analysis data found.\n");
+        printf("Please analyze a file first (Menu 2).\n");
+        return;
+    }
+
     fprintf(report, "Total words: %d\n", totalWords);
     fprintf(report, "Unique words: %d\n", uniqueCount);
     fprintf(report, "Average word length: %.2f\n", calculateAverageWordLength(words, wordCount));
@@ -246,6 +291,60 @@ void saveReportMenu() {
     printf("Analysis saved to analysis_report.txt\n");
 }
 
+void saveCSVReport() {
+    FILE* csv = fopen("analysis_report.csv", "w");
+    if (!csv) {
+        printf("Cannot open analysis_report.csv\n");
+        return;
+    }
+
+    if (totalWords == 0) {
+        printf("❌ ERROR: No data available to save.\n");
+        return;
+    }
+
+    // Header row
+    fprintf(csv, "Metric,Value\n");
+
+    // Data rows
+    fprintf(csv, "Total Words,%d\n", totalWords);
+    fprintf(csv, "Unique Words,%d\n", uniqueCount);
+    fprintf(csv, "Average Word Length,%.2f\n", calculateAverageWordLength(words, wordCount));
+
+    double toxicRatio = totalWords ? (double)totalToxicWords / totalWords * 100 : 0.0;
+    double nonToxicRatio = totalWords ? 100.0 - toxicRatio : 0.0;
+
+    fprintf(csv, "Toxic Ratio (%%),%.2f\n", toxicRatio);
+    fprintf(csv, "Non-Toxic Ratio (%%),%.2f\n", nonToxicRatio);
+
+    fclose(csv);
+    printf("CSV report saved as analysis_report.csv\n");
+}
+
+void displayToxicBarChart() {
+    printf("\n--- Toxic Words Bar Chart ---\n");
+
+    int found = 0;  // flag to check if any toxic words exist
+
+    for (int i = 0; i < toxicCount; i++) {
+        if (toxicFreq[i] > 0) {
+            found = 1; // at least one toxic word found
+            printf("%-10s | ", toxicWords[i]);  // word left-aligned
+            for (int j = 0; j < toxicFreq[i]; j++) {
+                printf("#");
+            }
+            printf(" (%d)\n", toxicFreq[i]);
+        }
+    }
+
+    if (!found) { // no toxic words found
+        printf("❌ ERROR: No toxic words found in the last analysis.\n");
+        printf("Please analyze a file first (Menu 2) or check your toxic words list.\n");
+    }
+}
+
+
+
 // ---------------- Main Program ----------------
 
 int main() {
@@ -258,7 +357,10 @@ int main() {
         printf("1. Add toxic words\n");
         printf("2. Read and analyze file\n");
         printf("3. Save analysis report\n");
-        printf("4. Exit\n");
+        printf("4. Reload dictionaries (stopword + toxic)\n");
+		printf("5. Save CSV report\n");
+		printf("6. Display toxic words bar chart\n");
+        printf("7. Exit\n");
         printf("Enter choice: ");
         scanf(" %c", &choice);
 
@@ -266,8 +368,11 @@ int main() {
         case '1': addToxicWordsMenu(); break;
         case '2': readAndAnalyzeFileMenu(); break;
         case '3': saveReportMenu(); break;
-        case '4': return 0;
-        default: printf("Invalid choice!\n");
+        case '4': reloadDictionaries(); break;
+        case '5': saveCSVReport(); break;
+        case '6': displayToxicBarChart(); break;
+        case '7': return 0;
         }
+
     }
 }
