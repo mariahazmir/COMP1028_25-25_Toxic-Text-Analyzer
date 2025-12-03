@@ -73,6 +73,7 @@ The Toxic Text Analyzer is a command-line application designed to:
 ```
 ├── main.c                    # Main entry point & menu system
 ├── data_types.h              # Global definitions & structures
+├── colors.h                  # ANSI color code definitions
 ├── text_processor.c          # Text normalization & processing
 ├── file_handler.c            # File I/O operations
 ├── analyzer.c                # Toxicity detection logic
@@ -95,12 +96,19 @@ The Toxic Text Analyzer is a command-line application designed to:
 │   ├── malay.txt             # 82 Malay toxic terms
 │   └── README.md             # Dictionary documentation
 ├── analysis/                 # Sample files for testing
-│   ├── cyberbullying_tweets.csv
-│   ├── hate_asian_1k.txt
-│   ├── hate_bisexual_1k.txt
-│   ├── hate_black_1k.txt
-│   ├── youtoxic_english_1000.csv
-│   └── testing.txt
+│   ├── asian.txt             # Hate speech - Asian (1000 samples)
+│   ├── bisexual.txt          # Hate speech - Bisexual (1000 samples)
+│   ├── black.txt             # Hate speech - Black (1000 samples)
+│   ├── cyber.csv             # Cyberbullying tweets (1000 samples)
+│   ├── ftr_labels.csv        # FTR labeled dataset
+│   ├── general.txt           # General text data
+│   ├── ghds.csv              # Additional dataset
+│   ├── hate_malay.csv        # Hate speech - Malay communities
+│   ├── keywords.txt          # Keyword reference file
+│   ├── labeled.csv           # Labeled dataset
+│   ├── lhsab.txt             # Additional test data
+│   ├── train.csv             # Training dataset
+│   └── youtoxic.csv          # YouTube toxic comments (1000 samples)
 └── README.md                 # This file
 ```
 
@@ -167,7 +175,7 @@ A. Export CSV report
 
 ```
 1. Start program → Run main executable
-2. Load file → Option 1 → Enter "cyberbullying_tweets.csv"
+2. Load file → Option 1 → Enter "cyber.csv"
 3. Select columns → Enter "1,2" to analyze specific columns
 4. View results → Program displays analysis statistics
 5. Sort words → Option 5 → Choose criterion and algorithm
@@ -277,13 +285,14 @@ To test the analyzer with your own files, add them to the `./analysis/` folder:
 3. Enter the filename when prompted
 4. Follow the on-screen instructions to select columns (for CSV) or view analysis
 
-Sample test files are provided in the `analysis/` folder:
-- `test_hate_asian_1000.txt`
-- `test_hate_bisexual_1000.txt`
-- `test_hate_black_1000.txt`
-- `test_cyberbullying_1000.csv`
-- `test_youtoxic_english_1000.csv`
-- `test_general_data.txt`
+Sample test files are provided in the `analysis/` folder with short, easy-to-type names:
+- `cyber.csv` - Cyberbullying tweets (1000 samples)
+- `general.txt` - General text data
+- `asian.txt` - Hate speech targeting Asian communities (1000 samples)
+- `bisexual.txt` - Hate speech targeting bisexual communities (1000 samples)
+- `black.txt` - Hate speech targeting Black communities (1000 samples)
+- `youtoxic.csv` - YouTube toxic comments (1000 samples)
+- `ftr_labels.csv` - FTR labeled dataset
 
 ## Troubleshooting
 
