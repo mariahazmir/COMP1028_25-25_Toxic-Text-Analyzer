@@ -12,9 +12,11 @@
   - External function declarations
  
  Configuration:
-  - MAX_TOXIC: 10,000 toxic words
-  - MAX_TOXIC_PHRASES: 2,000 multi-word phrases
-  - MAX_WORDS: 100,000 words per file
+  - MAX_WORDS: 1,000,000 words per file
+  - MAX_UNIQUE: 100,000 unique words
+  - MAX_TOXIC: 50,000 toxic words
+  - MAX_TOXIC_PHRASES: 10,000 multi-word phrases
+  - MAX_STOPWORDS: 2,000 common words
   - Supports 12 languages
 ================================================================================
 */
