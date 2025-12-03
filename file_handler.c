@@ -405,18 +405,76 @@ void saveReportMenu(void) {
         return;
     }
 
+    // ===== GENERAL STATISTICS =====
+    fprintf(report, "========================================\n");
+    fprintf(report, "       TEXT ANALYSIS REPORT\n");
+    fprintf(report, "========================================\n\n");
+    
+    fprintf(report, "--- General Statistics ---\n");
     fprintf(report, "Total words: %d\n", totalWords);
     fprintf(report, "Unique words: %d\n", uniqueCount);
     fprintf(report, "Total sentences: %d\n", totalSentences);
     fprintf(report, "Average word length: %.2f\n", calculateAverageWordLength(words, wordCount));
     fprintf(report, "Average sentence length: %.2f words\n", calculateAverageSentenceLength(totalWords, totalSentences));
-    fprintf(report, "Lexical diversity index: %.4f\n", calculateLexicalDiversity(uniqueCount, totalWords));
+    fprintf(report, "Lexical diversity index: %.4f\n\n", calculateLexicalDiversity(uniqueCount, totalWords));
 
+    // ===== TOXICITY METRICS =====
     double toxicRatio = totalWords ? (double)totalToxicWords / totalWords * 100 : 0.0;
     double nonToxicRatio = totalWords ? (double)(totalWords - totalToxicWords) / totalWords * 100 : 0.0;
 
+    fprintf(report, "--- Toxicity Metrics ---\n");
+    fprintf(report, "Total toxic occurrences: %d\n", totalToxicWords);
     fprintf(report, "Toxic ratio: %.2f%%\n", toxicRatio);
-    fprintf(report, "Non-toxic ratio: %.2f%%\n", nonToxicRatio);
+    fprintf(report, "Non-toxic ratio: %.2f%%\n\n", nonToxicRatio);
+
+    // ===== SEVERITY BREAKDOWN =====
+    int severeMild = 0, severeMod = 0, severeSev = 0;
+    int countMild = 0, countMod = 0, countSev = 0;
+    
+    for (int i = 0; i < toxicCount; i++) {
+        if (toxicFreq[i] > 0) {
+            if (toxicSeverity[i] == SEVERITY_MILD) {
+                severeMild++;
+                countMild += toxicFreq[i];
+            } else if (toxicSeverity[i] == SEVERITY_MODERATE) {
+                severeMod++;
+                countMod += toxicFreq[i];
+            } else if (toxicSeverity[i] == SEVERITY_SEVERE) {
+                severeSev++;
+                countSev += toxicFreq[i];
+            }
+        }
+    }
+
+    fprintf(report, "--- Severity Breakdown ---\n");
+    fprintf(report, "SEVERE (Hate Speech & Slurs):\n");
+    fprintf(report, "  Occurrences: %d | Unique words: %d\n", countSev, severeSev);
+    fprintf(report, "MODERATE (Insults & Strong Language):\n");
+    fprintf(report, "  Occurrences: %d | Unique words: %d\n", countMod, severeMod);
+    fprintf(report, "MILD (Vulgar Language & Crude Terms):\n");
+    fprintf(report, "  Occurrences: %d | Unique words: %d\n\n", countMild, severeMild);
+
+    // ===== TOP TOXIC WORDS =====
+    fprintf(report, "--- Top 10 Toxic Words Detected ---\n");
+    int topCount = 0;
+    for (int i = 0; i < toxicCount && topCount < 10; i++) {
+        if (toxicFreq[i] > 0) {
+            char severity[20];
+            if (toxicSeverity[i] == SEVERITY_MILD) strcpy(severity, "MILD");
+            else if (toxicSeverity[i] == SEVERITY_MODERATE) strcpy(severity, "MODERATE");
+            else strcpy(severity, "SEVERE");
+            
+            fprintf(report, "%d. %s (Freq: %d, Severity: %s)\n", topCount + 1, toxicWords[i], toxicFreq[i], severity);
+            topCount++;
+        }
+    }
+    if (topCount == 0) {
+        fprintf(report, "No toxic words detected.\n");
+    }
+
+    fprintf(report, "\n========================================\n");
+    fprintf(report, "Report generated successfully\n");
+    fprintf(report, "========================================\n");
 
     fclose(report);
     printf("Analysis saved to analysis_report.txt\n");
@@ -452,10 +510,9 @@ void saveCSVReport(void) {
         return;
     }
 
-    // Header row
+    // ===== GENERAL STATISTICS =====
+    fprintf(csv, "GENERAL STATISTICS\n");
     fprintf(csv, "Metric,Value\n");
-
-    // Data rows
     fprintf(csv, "Total Words,%d\n", totalWords);
     fprintf(csv, "Unique Words,%d\n", uniqueCount);
     fprintf(csv, "Total Sentences,%d\n", totalSentences);
@@ -466,8 +523,56 @@ void saveCSVReport(void) {
     double toxicRatio = totalWords ? (double)totalToxicWords / totalWords * 100 : 0.0;
     double nonToxicRatio = totalWords ? 100.0 - toxicRatio : 0.0;
 
+    // ===== TOXICITY METRICS =====
+    fprintf(csv, "\nTOXICITY METRICS\n");
+    fprintf(csv, "Metric,Value\n");
+    fprintf(csv, "Total Toxic Occurrences,%d\n", totalToxicWords);
     fprintf(csv, "Toxic Ratio (%%),%.2f\n", toxicRatio);
     fprintf(csv, "Non-Toxic Ratio (%%),%.2f\n", nonToxicRatio);
+
+    // ===== SEVERITY BREAKDOWN =====
+    int severeMild = 0, severeMod = 0, severeSev = 0;
+    int countMild = 0, countMod = 0, countSev = 0;
+    
+    for (int i = 0; i < toxicCount; i++) {
+        if (toxicFreq[i] > 0) {
+            if (toxicSeverity[i] == SEVERITY_MILD) {
+                severeMild++;
+                countMild += toxicFreq[i];
+            } else if (toxicSeverity[i] == SEVERITY_MODERATE) {
+                severeMod++;
+                countMod += toxicFreq[i];
+            } else if (toxicSeverity[i] == SEVERITY_SEVERE) {
+                severeSev++;
+                countSev += toxicFreq[i];
+            }
+        }
+    }
+
+    fprintf(csv, "\nSEVERITY BREAKDOWN\n");
+    fprintf(csv, "Severity Level,Occurrences,Unique Words\n");
+    fprintf(csv, "SEVERE,\"%d\",\"%d\"\n", countSev, severeSev);
+    fprintf(csv, "MODERATE,\"%d\",\"%d\"\n", countMod, severeMod);
+    fprintf(csv, "MILD,\"%d\",\"%d\"\n", countMild, severeMild);
+
+    // ===== TOP TOXIC WORDS =====
+    fprintf(csv, "\nTOP TOXIC WORDS DETECTED\n");
+    fprintf(csv, "Rank,Word,Frequency,Severity\n");
+    int topCount = 0;
+    for (int i = 0; i < toxicCount && topCount < 15; i++) {
+        if (toxicFreq[i] > 0) {
+            char severity[20];
+            if (toxicSeverity[i] == SEVERITY_MILD) strcpy(severity, "MILD");
+            else if (toxicSeverity[i] == SEVERITY_MODERATE) strcpy(severity, "MODERATE");
+            else strcpy(severity, "SEVERE");
+            
+            fprintf(csv, "%d,\"%s\",%d,%s\n", topCount + 1, toxicWords[i], toxicFreq[i], severity);
+            topCount++;
+        }
+    }
+    if (topCount == 0) {
+        fprintf(csv, "1,No toxic words detected,0,N/A\n");
+    }
 
     fclose(csv);
     printf("CSV report saved as analysis_report.csv\n");
