@@ -250,7 +250,7 @@ Edit `data_types.h` to adjust system limits:
 
 ## Toxic Word Dictionary
 
-The program includes **6,310+ toxic terms** from the **NLLB-200 Toxic Words List** project by Facebook Research.
+The program includes **7,776 toxic terms** across 12 languages from the **NLLB-200 Toxic Words List** project by Facebook Research.
 
 ### Adding New Languages
 
