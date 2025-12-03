@@ -233,11 +233,11 @@ Toxicity Ratio,0.80%
 Edit `data_types.h` to adjust system limits:
 
 ```c
-#define MAX_WORDS 100000        // Max words per file
-#define MAX_UNIQUE 10000        // Max unique words
-#define MAX_TOXIC 10000         // Max toxic word entries
-#define MAX_STOPWORDS 2000      // Max stopwords
-#define MAX_TOXIC_PHRASES 2000  // Max multi-word phrases
+#define MAX_WORDS 200000        // Max words per file
+#define MAX_UNIQUE 20000        // Max unique words
+#define MAX_TOXIC 15000         // Max toxic word entries
+#define MAX_STOPWORDS 5000      // Max stopwords
+#define MAX_TOXIC_PHRASES 3000  // Max multi-word phrases
 ```
 
 ## Toxic Word Dictionary
