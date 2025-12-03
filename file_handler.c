@@ -20,6 +20,7 @@
 */
 
 #include "data_types.h"
+#include "colors.h"
 #ifdef _WIN32
     #include <windows.h>
 #else
@@ -220,15 +221,15 @@ void reloadDictionaries(void) {
     for (int i = 0; i < MAX_TOXIC_PHRASES; i++)
         toxicPhrasesFreq[i] = 0;
 
-    printf("\nDictionaries reloaded successfully!\n");
-    printf("Stopwords loaded: %d\n", stopwordCount);
-    printf("Toxic words loaded: %d\n", toxicCount);
-    printf("Toxic phrases loaded: %d\n", toxicPhrasesCount);
+    printf("\n%s[SUCCESS] Dictionaries reloaded!%s\n", SUCCESS, RESET);
+    printf("%s  |- Stopwords:%s        %d\n", INFO, RESET, stopwordCount);
+    printf("%s  |- Toxic words:%s      %d\n", INFO, RESET, toxicCount);
+    printf("%s  L- Toxic phrases:%s    %d%s\n\n", INFO, RESET, toxicPhrasesCount, RESET);
 
     if (stopwordCount == 0)
-        printf("WARNING: stopwords.txt is empty or missing.\n");
+        printf("%s[WARNING] stopwords.txt is empty or missing%s\n", WARNING, RESET);
     if (toxicCount == 0 && toxicPhrasesCount == 0)
-        printf("WARNING: toxicwords.txt is empty or missing.\n");
+        printf("%s[WARNING] toxicwords.txt is empty or missing%s\n", WARNING, RESET);
 }
 
 /*

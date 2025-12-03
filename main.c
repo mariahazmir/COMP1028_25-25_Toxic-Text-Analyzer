@@ -1,5 +1,6 @@
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 #include "data_types.h"
+#include "colors.h"
 
 /*
 ================================================================================
@@ -413,21 +414,26 @@ void readAndAnalyzeFileMenu(void) {
     printf("Toxic analysis complete! Found %d toxic occurrences.\n", totalToxicWords);
     fflush(stdout);
               
-    printf("\n========File Analysis Results for (%s)=======\n", fileName);
-    printf("\nTotal words: %d\n", totalWords);
-    printf("Unique words: %d\n", uniqueCount);
-    printf("Total sentences: %d\n", totalSentences);
-    printf("Average word length: %.2f\n", calculateAverageWordLength(words, wordCount));
-    printf("Average sentence length: %.2f words\n", calculateAverageSentenceLength(totalWords, totalSentences));
-    printf("Lexical diversity index: %.4f\n", calculateLexicalDiversity(uniqueCount, totalWords));
+    printf("\n%sâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•%s\n", DIVIDER, RESET);
+    printf("%s  ANALYSIS RESULTS: %s\n", MENU_LABEL, fileName);
+    printf("%sâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•%s\n", DIVIDER, RESET);
+    
+    printf("\n%s>> Text Statistics%s\n", MENU_LABEL, RESET);
+    printf("   %sTotal words:%s         %s%d%s\n", STAT_LABEL, RESET, STAT_VALUE, totalWords, RESET);
+    printf("   %sUnique words:%s        %s%d%s\n", STAT_LABEL, RESET, STAT_VALUE, uniqueCount, RESET);
+    printf("   %sTotal sentences:%s     %s%d%s\n", STAT_LABEL, RESET, STAT_VALUE, totalSentences, RESET);
+    printf("   %sAverage word length:%s %s%.2f%s\n", STAT_LABEL, RESET, STAT_VALUE, calculateAverageWordLength(words, wordCount), RESET);
+    printf("   %sAvg sentence length:%s %s%.2f%s words\n", STAT_LABEL, RESET, STAT_VALUE, calculateAverageSentenceLength(totalWords, totalSentences), RESET);
+    printf("   %sLexical diversity:%s   %s%.4f%s\n", STAT_LABEL, RESET, STAT_VALUE, calculateLexicalDiversity(uniqueCount, totalWords), RESET);
 
     double toxicRatio = totalWords ? (double)totalToxicWords / totalWords * 100 : 0.0;
     double nonToxicRatio = totalWords ? (double)(totalWords - totalToxicWords) / totalWords * 100 : 0.0;
 
-    printf("\nToxic content analysis:\n");
-    printf("Toxic occurrences: %d (including phrases)\n", totalToxicWords);
-    printf("Toxic ratio: %.2f%%\n", toxicRatio);
-    printf("Non-toxic ratio: %.2f%%\n", nonToxicRatio);
+    printf("\n%s>> Toxicity Analysis%s\n", ERROR, RESET);
+    printf("   %sToxic occurrences:%s   %s%d%s\n", STAT_LABEL, RESET, STAT_VALUE, totalToxicWords, RESET);
+    printf("   %sToxic ratio:%s         %s%.2f%%%s\n", STAT_LABEL, RESET, BRIGHT_GREEN, toxicRatio, RESET);
+    printf("   %sNon-toxic ratio:%s     %s%.2f%%%s\n", STAT_LABEL, RESET, BRIGHT_GREEN, nonToxicRatio, RESET);
+    printf("%sâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•%s\n\n", DIVIDER, RESET);
 
     fclose(file);
 }
@@ -445,7 +451,7 @@ void readAndAnalyzeFileMenu(void) {
   3. Toxicity count (Most toxic words first)
  
  Sorting Algorithms:
-  1. Bubble Sort - O(n²), simple but slower
+  1. Bubble Sort - O(nÂ²), simple but slower
   2. Quick Sort - O(n log n), efficient
   3. Merge Sort - O(n log n), stable
  
@@ -461,30 +467,27 @@ void displaySortedWordsMenu(void) {
     }
 
     char criterionChoice;
-    printf("\n====================================================\n");
-    printf("         SELECT SORTING CRITERION\n");
-    printf("====================================================\n");
-    printf("  1. Alphabetical order (A-Z)\n");
-    printf("  2. Frequency-based (Most to Least)\n");
-    printf("  3. Toxicity count (Most to Least)\n");
-    printf("====================================================\n");
-    printf("\n> Enter your choice (1, 2, or 3): ");
+    printf("\n%sâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•%s\n", DIVIDER, RESET);
+    printf("%s  SORTING OPTIONS                               %s\n", MENU_LABEL, DIVIDER);
+    printf("%sâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•%s\n", DIVIDER, RESET);
+    printf("\n%sSelect sorting criterion:%s\n", MENU_LABEL, RESET);
+    printf("   %s[1]%s Alphabetical (A-Z)\n", OPTION_NUM, RESET);
+    printf("   %s[2]%s Frequency-based (Most to Least)\n", OPTION_NUM, RESET);
+    printf("   %s[3]%s Toxicity count (Most to Least)\n", OPTION_NUM, RESET);
+    printf("\n%s> Enter choice (1-3):%s ", PROMPT, RESET);
     criterionChoice = getValidMenuChoice("123");
     
     if (criterionChoice == '\0') {
-        printf("Invalid choice. Returning to menu.\n");
+        printf("%sInvalid choice. Returning to menu.%s\n", ERROR, RESET);
         return;
     }
 
     char sortChoice;
-    printf("\n====================================================\n");
-    printf("        SELECT SORTING ALGORITHM\n");
-    printf("====================================================\n");
-    printf("  1. Bubble Sort      (O(n^2))\n");
-    printf("  2. Quick Sort       (O(n log n))\n");
-    printf("  3. Merge Sort       (O(n log n))\n");
-    printf("====================================================\n");
-    printf("\n> Enter your choice (1, 2, or 3): ");
+    printf("\n%sSelect sorting algorithm:%s\n", MENU_LABEL, RESET);
+    printf("   %s[1]%s Bubble Sort      O(n^2) - Simple\n", OPTION_NUM, RESET);
+    printf("   %s[2]%s Quick Sort       O(n log n) - Efficient\n", OPTION_NUM, RESET);
+    printf("   %s[3]%s Merge Sort       O(n log n) - Stable\n", OPTION_NUM, RESET);
+    printf("\n%s> Enter choice (1-3):%s ", PROMPT, RESET);
     sortChoice = getValidMenuChoice("123");
     
     if (sortChoice == '\0') {
@@ -508,44 +511,42 @@ void displaySortedWordsMenu(void) {
     if (criterionChoice == '1') {
         // Alphabetical sorting
         // Sort the unique words
-        printf("\n====================================================\n");
+        printf("\n%sâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•%s\n", DIVIDER, RESET);
         clock_t start = clock();
 
         if (sortChoice == '1') {
-            printf(" SORTING %d UNIQUE WORDS (BUBBLE SORT)...\n", uniqueCount);
-            printf("====================================================\n");
+            printf("%s  BUBBLE SORT - %d words                        %s\n", MENU_LABEL, uniqueCount, DIVIDER);
             bubbleSortWords(sortedWords, uniqueCount);
         }
         else if (sortChoice == '2') {
-            printf(" SORTING %d UNIQUE WORDS (QUICK SORT)...\n", uniqueCount);
-            printf("====================================================\n");
+            printf("%s  QUICK SORT - %d words                         %s\n", MENU_LABEL, uniqueCount, DIVIDER);
             quickSortWords(sortedWords, 0, uniqueCount - 1);
         }
         else if (sortChoice == '3') {
-            printf(" SORTING %d UNIQUE WORDS (MERGE SORT)...\n", uniqueCount);
-            printf("====================================================\n");
+            printf("%s  MERGE SORT - %d words                         %s\n", MENU_LABEL, uniqueCount, DIVIDER);
             mergeSortWords(sortedWords, uniqueCount);
         }
 
         clock_t end = clock();
         double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC * 1000;
 
-        printf("[OK] Sort complete! Time: %.3f ms\n\n", time_taken);
+        printf("%sâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•%s\n", DIVIDER, RESET);
+        printf("%s[DONE]%s Time: %s%.3f ms%s\n\n", SUCCESS, RESET, BRIGHT_BLUE, time_taken, RESET);
                
-        printf("=============Sorted UNIQUE Words (A-Z)==============\n");
+        printf("%s SORTED RESULTS (First 50 of %d)%s\n", MENU_LABEL, uniqueCount, RESET);
+        printf("%sâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€%s\n", DIVIDER, RESET);
 
         int displayLimit = (uniqueCount < 50) ? uniqueCount : 50;
         for (int i = 0; i < displayLimit; i++) {
-            printf("%3d. %s\n", i + 1, sortedWords[i]);
+            printf("%s%3d.%s %-40s\n", OPTION_NUM, i + 1, RESET, sortedWords[i]);
         }
 
         if (uniqueCount > 50) {
-            printf("\n... (%d more unique words not shown)\n", uniqueCount - 50);
+            printf("%s\n... and %d more words%s\n", INFO, uniqueCount - 50, RESET);
         }
 
-        printf("\n====================================================\n");
-        printf(" Total Unique Words Sorted: %d\n", uniqueCount);
-        printf("====================================================\n");
+        printf("%sâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€%s\n", DIVIDER, RESET);
+        printf("%sTOTAL: %d unique words sorted%s\n\n", SUCCESS, uniqueCount, RESET);
     }
     else if (criterionChoice == '2') {
         // Frequency-based sorting
@@ -576,7 +577,7 @@ void displaySortedWordsMenu(void) {
  
  Returns: void
  Time Complexity: 
-  - Overall: O(3 * n²) due to Bubble Sort (worst case)
+  - Overall: O(3 * nÂ²) due to Bubble Sort (worst case)
   - But typically O(3 * n log n) with Quick/Merge sort
 */
 
@@ -752,30 +753,30 @@ int main() {
 
     while (1) {
         printf("\n");
-        printf("====================================================\n");
-        printf("          TOXIC WORDS ANALYSIS SYSTEM\n");
-        printf("====================================================\n");
+        printf("%s===================================================%s\n", DIVIDER, RESET);
+        printf("%s  %sTOXIC TEXT ANALYZER%s                       %s\n", DIVIDER, HEADER, RESET, DIVIDER);
+        printf("%s===================================================%s\n", DIVIDER, RESET);
         printf("\n");
-        printf("  FILE OPERATIONS:\n");
-        printf("  1. Load and analyze text file\n");
-        printf("  2. Add/manage toxic words dictionary\n");
-        printf("  3. Reload dictionaries from file\n");
+        printf("%sFile Operations:%s\n", MENU_LABEL, RESET);
+        printf("   %s[1]%s Load and analyze file\n", OPTION_NUM, RESET);
+        printf("   %s[2]%s Add/manage toxic words\n", OPTION_NUM, RESET);
+        printf("   %s[3]%s Reload dictionaries\n", OPTION_NUM, RESET);
         printf("\n");
-        printf("  ANALYSIS & REPORTS:\n");
-        printf("  4. Display toxic words bar chart\n");
-        printf("  5. Analyze word frequencies (sort by algorithm)\n");
-        printf("  6. View severity breakdown analysis\n");
-        printf("  7. Compare sorting algorithms performance\n");
+        printf("%sAnalysis & Reports:%s\n", MENU_LABEL, RESET);
+        printf("   %s[4]%s Display toxic words chart\n", OPTION_NUM, RESET);
+        printf("   %s[5]%s Analyze word frequencies\n", OPTION_NUM, RESET);
+        printf("   %s[6]%s View severity breakdown\n", OPTION_NUM, RESET);
+        printf("   %s[7]%s Compare sorting algorithms\n", OPTION_NUM, RESET);
         printf("\n");
-        printf("  ADVANCED:\n");
-        printf("  8. Compare two files (File A vs File B)\n");
-        printf("  9. Save text report\n");
-        printf("  A. Export CSV report\n");
+        printf("%sAdvanced:%s\n", MENU_LABEL, RESET);
+        printf("   %s[8]%s Compare two files\n", OPTION_NUM, RESET);
+        printf("   %s[9]%s Save text report\n", OPTION_NUM, RESET);
+        printf("   %s[A]%s Export CSV report\n", OPTION_NUM, RESET);
         printf("\n");
-        printf("  0. Exit program\n");
-        printf("\n");
-        printf("====================================================\n");
-        printf("\n> Enter your choice: ");
+        printf("%s---------------------------------------------------%s\n", DIVIDER, RESET);
+        printf("   %s[0]%s Exit program\n", OPTION_NUM, RESET);
+        printf("%s---------------------------------------------------%s\n", DIVIDER, RESET);
+        printf("\n%s> Enter your choice:%s ", PROMPT, RESET);
     
         choice = getValidMenuChoice("0123456789Aa");
         
@@ -816,7 +817,7 @@ int main() {
             saveCSVReport();
             break;
         case '0':
-            printf("Exiting program. Goodbye!\n");
+            printf("\n%sThank you for using Toxic Text Analyzer!%s\n\n", SUCCESS, RESET);
             // Free allocated memory before exiting
             free(words);
             free(uniqueWords);
@@ -827,3 +828,5 @@ int main() {
         }
     }
 }
+
+

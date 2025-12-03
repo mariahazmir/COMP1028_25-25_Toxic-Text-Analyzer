@@ -233,11 +233,11 @@ Toxicity Ratio,0.80%
 Edit `data_types.h` to adjust system limits:
 
 ```c
-#define MAX_WORDS 200000        // Max words per file
-#define MAX_UNIQUE 20000        // Max unique words
-#define MAX_TOXIC 15000         // Max toxic word entries
-#define MAX_STOPWORDS 5000      // Max stopwords
-#define MAX_TOXIC_PHRASES 3000  // Max multi-word phrases
+#define MAX_WORDS 1000000       // Max words per file
+#define MAX_UNIQUE 100000       // Max unique words
+#define MAX_TOXIC 50000         // Max toxic word entries
+#define MAX_STOPWORDS 2000      // Max stopwords
+#define MAX_TOXIC_PHRASES 10000 // Max multi-word phrases
 ```
 
 ## Toxic Word Dictionary
@@ -263,10 +263,10 @@ The program includes **6,310+ toxic terms** from the **NLLB-200 Toxic Words List
 
 ## Known Limitations
 
-- **Memory**: Limited to ~100K words per file analysis
+- **Memory**: Limited to ~1M words per file analysis
 - **CSV**: Tested with standard CSV format; complex nested structures may not parse correctly
 - **Languages**: Supports only the 12 included languages
-- **Performance**: Large datasets (>100K rows) may require several seconds to process
+- **Performance**: Large datasets (>500K rows) may require several seconds to process
 
 ## Testing with Your Own Files
 

@@ -1,4 +1,5 @@
 #include "data_types.h"
+#include "colors.h"
 
 // Compare function for sorting by frequency (descending)
 int compareByFreqDesc(const void *a, const void *b) {
