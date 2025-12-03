@@ -15,18 +15,18 @@ The toxic word lists for most languages were obtained from:
 |----------|------|--------|-----------|
 | English | `english.txt` | NLLB-200 TWL | 1,117 |
 | Spanish | `spanish.txt` | NLLB-200 TWL | 1,195 |
-| French | `french.txt` | NLLB-200 TWL | 29 |
+| French | `french.txt` | NLLB-200 TWL | 1407 |
 | German | `german.txt` | NLLB-200 TWL | 256 |
 | Italian | `italian.txt` | NLLB-200 TWL | 735 |
-| Portuguese | `portuguese.txt` | NLLB-200 TWL | 661 |
+| Portuguese | `portuguese.txt` | NLLB-200 TWL | 657 |
 | Russian | `russian.txt` | NLLB-200 TWL | 1,465 |
-| Japanese | `japanese.txt` | NLLB-200 TWL | 291 |
+| Japanese | `japanese.txt` | NLLB-200 TWL | 290 |
 | Chinese | `chinese.txt` | NLLB-200 TWL | 304 |
 | Arabic | `arabic.txt` | NLLB-200 TWL | 135 |
 | Hindi | `hindi.txt` | NLLB-200 TWL | 133 |
-| Malay | `malay.txt` | Custom | 89 |
+| Malay | `malay.txt` | NLLB-200 TWL | 82 |
 
-**Total: 6,310+ toxic terms across 12 languages**
+**Total: 6,310 toxic terms across 12 languages**
 
 ## File Format
 
