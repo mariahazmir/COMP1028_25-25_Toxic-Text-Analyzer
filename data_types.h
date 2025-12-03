@@ -31,11 +31,11 @@
 // ============= Configuration Constants =============
 
 #define BUFFER_SIZE 100000      // Buffer for file reading
-#define MAX_WORDS 100000        // Maximum words to extract from file
-#define MAX_UNIQUE 10000        // Maximum unique words to track
+#define MAX_WORDS 1000000       // Maximum words to extract from file
+#define MAX_UNIQUE 100000       // Maximum unique words to track
 #define MAX_STOPWORDS 2000      // Maximum stopwords to load
-#define MAX_TOXIC 10000         // Maximum toxic words (increased from 2000)
-#define MAX_TOXIC_PHRASES 2000  // Maximum multi-word phrases (increased from 500)
+#define MAX_TOXIC 50000         // Maximum toxic words
+#define MAX_TOXIC_PHRASES 10000 // Maximum multi-word phrases
 
 // ============= Severity Levels =============
 
