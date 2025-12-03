@@ -2,19 +2,35 @@
 
 A comprehensive C-based system for detecting, analyzing, and reporting toxic content in multilingual text and CSV files.
 
+## Quick Start
+
+### Compile
+```bash
+gcc -o main main.c text_processor.c file_handler.c analyzer.c sorting.c reporting.c comparative.c
+```
+
+Alternatively, use the VS Code build task (Ctrl+Shift+B on Windows).
+
+### Run
+```bash
+./main
+```
+
+Follow the on-screen menu to begin analyzing text for toxic content.
+
 ## Overview
 
 The Toxic Text Analyzer is a command-line application designed to:
-- **Detect** toxic and offensive language across 12 languages
-- **Analyze** text metrics (word count, uniqueness, sentence analysis)
-- **Categorize** toxicity by severity levels (Mild, Moderate, Severe)
-- **Compare** toxicity metrics between multiple files
-- **Generate** detailed reports in text and CSV formats
-- **Benchmark** sorting algorithm performance on analyzed data
+- Detect toxic and offensive language across 12 languages
+- Analyze text metrics including word count, uniqueness, and sentence analysis
+- Categorize toxicity by severity levels (Mild, Moderate, Severe)
+- Compare toxicity metrics between multiple files
+- Generate detailed reports in text and CSV formats
+- Benchmark sorting algorithm performance on analyzed data
 
 ## Features
 
-### 📊 Text Analysis
+### Text Analysis
 - Load and process both `.txt` and `.csv` files
 - Extract words, sentences, and calculate linguistic metrics
 - Support for CSV column selection
@@ -22,35 +38,35 @@ The Toxic Text Analyzer is a command-line application designed to:
 - Track unique vs. total word counts
 - Calculate lexical diversity index
 
-### 🚨 Toxicity Detection
-- **7,776 toxic terms** across 12 languages
+### Toxicity Detection
+- 7,776 toxic terms across 12 languages
 - Detects single-word and multi-word toxic phrases
-- **Severity categorization**:
+- Severity categorization:
   - Level 1 (Mild): Vulgar language, crude sexual terms
   - Level 2 (Moderate): Insults, derogatory terms, strong profanities
   - Level 3 (Severe): Hate speech, racist slurs, dehumanizing terms
 - Case-insensitive matching
 - Calculates toxicity ratio and frequency statistics
 
-### 📈 Data Visualization & Sorting
-- Sort words by: alphabetical order, frequency, or toxicity count
+### Data Visualization and Sorting
+- Sort words by alphabetical order, frequency, or toxicity count
 - Three sorting algorithms:
-  - **Bubble Sort** (O(n²)) - Simple reference implementation
-  - **Quick Sort** (O(n log n)) - Fast and efficient
-  - **Merge Sort** (O(n log n)) - Stable sorting
+  - Bubble Sort (O(n²)) - Simple reference implementation
+  - Quick Sort (O(n log n)) - Efficient general-purpose algorithm
+  - Merge Sort (O(n log n)) - Stable sorting algorithm
 - Automatic algorithm performance comparison
 - Display top toxic words with frequency counts
 
-### 🔄 Comparative Analysis
+### Comparative Analysis
 - Compare two files side-by-side
 - Generate comparative reports
 - Analyze differences in toxicity metrics
 
-### 💾 Reporting
-- **Text Reports**: Formatted analysis with all statistics
-- **CSV Export**: Machine-readable format for further analysis
-- **Bar Charts**: Visual representation of toxic word frequencies
-- **Severity Breakdown**: Analysis of toxicity distribution
+### Reporting
+- Text Reports: Formatted analysis with all statistics
+- CSV Export: Machine-readable format for further analysis
+- Bar Charts: Visual representation of toxic word frequencies
+- Severity Breakdown: Analysis of toxicity distribution
 
 ## Project Structure
 
@@ -94,20 +110,6 @@ The Toxic Text Analyzer is a command-line application designed to:
 - **Compiler**: GCC or compatible C compiler
 - **Memory**: Minimum 512MB RAM
 - **Storage**: ~50MB for toxic word dictionaries
-
-## Building & Running
-
-### Compile
-```bash
-gcc -o main main.c text_processor.c file_handler.c analyzer.c sorting.c reporting.c comparative.c
-```
-
-Or use the VS Code build task (Ctrl+Shift+B on Windows).
-
-### Run
-```bash
-./main
-```
 
 ## Usage
 
@@ -268,14 +270,14 @@ The program includes **6,310+ toxic terms** from the **NLLB-200 Toxic Words List
 
 ## Testing with Your Own Files
 
-To test the analyzer with your own files, simply add them to the `./analysis/` folder:
+To test the analyzer with your own files, add them to the `./analysis/` folder:
 
 1. Place your `.txt` or `.csv` files in the `analysis/` directory
 2. Run the program and select Option 1 (Load and analyze text file)
 3. Enter the filename when prompted
 4. Follow the on-screen instructions to select columns (for CSV) or view analysis
 
-The `analysis/` folder contains sample test files to get you started:
+Sample test files are provided in the `analysis/` folder:
 - `test_hate_asian_1000.txt`
 - `test_hate_bisexual_1000.txt`
 - `test_hate_black_1000.txt`
@@ -287,29 +289,29 @@ The `analysis/` folder contains sample test files to get you started:
 
 ### "File not found" error
 - Ensure file is in current directory or `./analysis/` folder
-- Check filename spelling and extension
+- Verify filename spelling and extension
 
 ### "Memory allocation failed"
-- Close other programs to free memory
+- Close unnecessary applications to free memory
 - Reduce `MAX_WORDS` constant in `data_types.h`
 
 ### No toxic words detected
 - Verify toxic word dictionaries are in `./toxic_words/` folder
 - Use Option 3 to reload dictionaries
-- Check file contains actual toxic language
+- Verify input file contains analyzable content
 
 ### Sorting is slow
-- For large unique word counts (>10K), prefer Quick Sort or Merge Sort
-- Bubble Sort is O(n²) and provided as educational reference
+- For large unique word counts (>10K), use Quick Sort or Merge Sort
+- Bubble Sort (O(n²)) is provided for educational purposes
 
 ## Contributing
 
-To enhance the program:
+To enhance this project:
 
-1. **Add languages**: Place new `.txt` files in `toxic_words/`
-2. **Improve detection**: Enhance regex patterns in `text_processor.c`
-3. **Optimize sorting**: Replace algorithms in `sorting.c`
-4. **Better reporting**: Add visualization in `reporting.c`
+1. Add languages by placing new `.txt` files in `toxic_words/`
+2. Improve detection by enhancing regex patterns in `text_processor.c`
+3. Optimize sorting algorithms in `sorting.c`
+4. Enhance reporting functionality in `reporting.c`
 
 ## Attribution
 
@@ -323,7 +325,7 @@ Educational use. Please refer to the NLLB-200 project for licensing details on t
 
 ## Author Notes
 
-This program demonstrates:
+This project demonstrates:
 - Dynamic memory management in C
 - File I/O and CSV parsing
 - Sorting algorithm implementations and analysis
@@ -333,6 +335,16 @@ This program demonstrates:
 
 ---
 
-**Version**: 1.0  
-**Last Updated**: December 2025  
+**Version**: 1.0
+**Last Updated**: December 2025
 **Course**: COMP1028 - Programming and Algorithms (University of Nottingham Malaysia)
+
+## Project Information
+
+**Group**: 25/25  
+**Team Members**:
+- Mariah
+- Haylee
+- Sakinah
+
+*This project was developed as coursework for COMP1028 Programming and Algorithms at the University of Nottingham Malaysia, demonstrating proficiency in C programming, algorithm design, and data structure implementation.*
