@@ -1,8 +1,8 @@
-Total words: 5503
-Unique words: 830
-Total sentences: 723
-Average word length: 6.36
-Average sentence length: 7.61 words
-Lexical diversity index: 0.1508
-Toxic ratio: 10.70%
-Non-toxic ratio: 89.30%
+Total words: 82
+Unique words: 67
+Total sentences: 20
+Average word length: 5.48
+Average sentence length: 4.10 words
+Lexical diversity index: 0.8171
+Toxic ratio: 2.44%
+Non-toxic ratio: 97.56%

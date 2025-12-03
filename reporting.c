@@ -98,9 +98,9 @@ void mergeSortWordFreq(struct WordFreq *arr, int n) {
 
 void displayToxicBarChart(void) {
     printf("\n");
-    printf("====================================================\n");
-    printf("     TOXIC WORDS & PHRASES BAR CHART\n");
-    printf("====================================================\n");
+    printf("%s====================================================%s\n", DIVIDER, RESET);
+    printf("%s  TOXIC WORDS & PHRASES BAR CHART%s\n", MENU_LABEL, RESET);
+    printf("%s====================================================%s\n", DIVIDER, RESET);
     int found = 0;
 
     // --- Display Single Toxic Words (sorted by frequency) ---
@@ -311,9 +311,9 @@ void displaySeverityBreakdown(void) {
     int countMild = 0, countMod = 0, countSev = 0;
     
     printf("\n");
-    printf("====================================================\n");
-    printf("     TOXIC CONTENT SEVERITY ANALYSIS REPORT\n");
-    printf("====================================================\n");
+    printf("%s====================================================%s\n", DIVIDER, RESET);
+    printf("%s  SEVERITY ANALYSIS REPORT%s\n", MENU_LABEL, RESET);
+    printf("%s====================================================%s\n", DIVIDER, RESET);
     
     // Count by severity level
     for (int i = 0; i < toxicCount; i++) {

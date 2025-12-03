@@ -1,4 +1,5 @@
 #include "data_types.h"
+#include "colors.h"
 
 // ============= Helper: Perform Analysis on a File and Store Results =============
 
@@ -221,9 +222,9 @@ struct AnalysisResult performFileAnalysis(const char* fileName) {
 void analyzeFileA(void) {
     char fileName[260];
     printf("\n");
-    printf("====================================================\n");
-    printf("             ANALYZE FILE A\n");
-    printf("====================================================\n");
+    printf("%s====================================================%s\n", DIVIDER, RESET);
+    printf("%s  ANALYZE FILE A%s\n", MENU_LABEL, RESET);
+    printf("%s====================================================%s\n", DIVIDER, RESET);
     clearInputBuffer();  // Clear any leftover input
     printf("Enter filename for File A: ");
     scanf("%s", fileName);
@@ -243,9 +244,9 @@ void analyzeFileA(void) {
 void analyzeFileB(void) {
     char fileName[260];
     printf("\n");
-    printf("====================================================\n");
-    printf("             ANALYZE FILE B\n");
-    printf("====================================================\n");
+    printf("%s====================================================%s\n", DIVIDER, RESET);
+    printf("%s  ANALYZE FILE B%s\n", MENU_LABEL, RESET);
+    printf("%s====================================================%s\n", DIVIDER, RESET);
     clearInputBuffer();  // Clear any leftover input
     printf("Enter filename for File B: ");
     scanf("%s", fileName);
@@ -264,18 +265,18 @@ void analyzeFileB(void) {
 
 void generateComparativeReport(void) {
     if (!fileA_Results.isLoaded || !fileB_Results.isLoaded) {
-        printf("\n  *** COMPARISON REQUIRES TWO FILES ***\n");
-        printf("  File A: %s\n", fileA_Results.isLoaded ? "LOADED" : "NOT LOADED");
-        printf("  File B: %s\n", fileB_Results.isLoaded ? "LOADED" : "NOT LOADED");
+        printf("\n  %s*** COMPARISON REQUIRES TWO FILES **-%s\n", ERROR, RESET);
+        printf("  File A: %s%s%s\n", fileA_Results.isLoaded ? SUCCESS : WARNING, fileA_Results.isLoaded ? "LOADED" : "NOT LOADED", RESET);
+        printf("  File B: %s%s%s\n", fileB_Results.isLoaded ? SUCCESS : WARNING, fileB_Results.isLoaded ? "LOADED" : "NOT LOADED", RESET);
         printf("  Please analyze both files before comparing\n\n");
         printf("Please use options to analyze File A and File B.\n");
         return;
     }
     
     printf("\n");
-    printf("====================================================\n");
-    printf("          COMPARATIVE ANALYSIS REPORT\n");
-    printf("====================================================\n\n");
+    printf("%s====================================================%s\n", DIVIDER, RESET);
+    printf("%s  COMPARATIVE ANALYSIS REPORT%s\n", MENU_LABEL, RESET);
+    printf("%s====================================================%s\n", DIVIDER, RESET);
     
     printf("FILE A: %s\n", fileA_Results.filename);
     printf("FILE B: %s\n\n", fileB_Results.filename);
@@ -350,15 +351,15 @@ void comparativeAnalysisMenu(void) {
     
     while (1) {
         printf("\n");
-        printf("====================================================\n");
-        printf("         COMPARATIVE ANALYSIS MENU\n");
-        printf("====================================================\n");
-        printf("* 1. Analyze File A                                *\n");
-        printf("* 2. Analyze File B                                *\n");
-        printf("* 3. Generate Comparative Report                   *\n");
-        printf("* 0. Return to Main Menu                           *\n");
-        printf("====================================================\n");
-        printf("Enter your choice: ");
+        printf("%s====================================================%s\n", DIVIDER, RESET);
+        printf("%s  COMPARATIVE ANALYSIS MENU%s\n", MENU_LABEL, RESET);
+        printf("%s====================================================%s\n", DIVIDER, RESET);
+        printf("%s* 1.%s Analyze File A\n", OPTION_NUM, RESET);
+        printf("%s* 2.%s Analyze File B\n", OPTION_NUM, RESET);
+        printf("%s* 3.%s Generate Comparative Report\n", OPTION_NUM, RESET);
+        printf("%s* 0.%s Return to Main Menu\n", OPTION_NUM, RESET);
+        printf("%s====================================================%s\n", DIVIDER, RESET);
+        printf("%s> Enter your choice:%s ", PROMPT, RESET);
         
         scanf(" %c", &choice);
         
