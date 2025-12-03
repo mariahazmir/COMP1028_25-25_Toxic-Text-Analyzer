@@ -414,9 +414,9 @@ void readAndAnalyzeFileMenu(void) {
     printf("Toxic analysis complete! Found %d toxic occurrences.\n", totalToxicWords);
     fflush(stdout);
               
-    printf("\n%sâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•%s\n", DIVIDER, RESET);
+    printf("\n%s====================================================%s\n", DIVIDER, RESET);
     printf("%s  ANALYSIS RESULTS: %s\n", MENU_LABEL, fileName);
-    printf("%sâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•%s\n", DIVIDER, RESET);
+    printf("%s====================================================%s\n", DIVIDER, RESET);
     
     printf("\n%s>> Text Statistics%s\n", MENU_LABEL, RESET);
     printf("   %sTotal words:%s         %s%d%s\n", STAT_LABEL, RESET, STAT_VALUE, totalWords, RESET);
@@ -433,7 +433,7 @@ void readAndAnalyzeFileMenu(void) {
     printf("   %sToxic occurrences:%s   %s%d%s\n", STAT_LABEL, RESET, STAT_VALUE, totalToxicWords, RESET);
     printf("   %sToxic ratio:%s         %s%.2f%%%s\n", STAT_LABEL, RESET, BRIGHT_GREEN, toxicRatio, RESET);
     printf("   %sNon-toxic ratio:%s     %s%.2f%%%s\n", STAT_LABEL, RESET, BRIGHT_GREEN, nonToxicRatio, RESET);
-    printf("%sâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•%s\n\n", DIVIDER, RESET);
+    printf("%s====================================================%s\n\n", DIVIDER, RESET);
 
     fclose(file);
 }
@@ -467,9 +467,9 @@ void displaySortedWordsMenu(void) {
     }
 
     char criterionChoice;
-    printf("\n%sâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•%s\n", DIVIDER, RESET);
+    printf("\n%s====================================================%s\n", DIVIDER, RESET);
     printf("%s  SORTING OPTIONS                               %s\n", MENU_LABEL, DIVIDER);
-    printf("%sâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•%s\n", DIVIDER, RESET);
+    printf("%s====================================================%s\n", DIVIDER, RESET);
     printf("\n%sSelect sorting criterion:%s\n", MENU_LABEL, RESET);
     printf("   %s[1]%s Alphabetical (A-Z)\n", OPTION_NUM, RESET);
     printf("   %s[2]%s Frequency-based (Most to Least)\n", OPTION_NUM, RESET);
@@ -511,7 +511,7 @@ void displaySortedWordsMenu(void) {
     if (criterionChoice == '1') {
         // Alphabetical sorting
         // Sort the unique words
-        printf("\n%sâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•%s\n", DIVIDER, RESET);
+        printf("\n%s====================================================%s\n", DIVIDER, RESET);
         clock_t start = clock();
 
         if (sortChoice == '1') {
@@ -530,7 +530,7 @@ void displaySortedWordsMenu(void) {
         clock_t end = clock();
         double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC * 1000;
 
-        printf("%sâ•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•%s\n", DIVIDER, RESET);
+        printf("%s====================================================%s\n", DIVIDER, RESET);
         printf("%s[DONE]%s Time: %s%.3f ms%s\n\n", SUCCESS, RESET, BRIGHT_BLUE, time_taken, RESET);
                
         printf("%s SORTED RESULTS (First 50 of %d)%s\n", MENU_LABEL, uniqueCount, RESET);
