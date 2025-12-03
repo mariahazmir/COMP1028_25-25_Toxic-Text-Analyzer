@@ -266,6 +266,23 @@ The program includes **6,310+ toxic terms** from the **NLLB-200 Toxic Words List
 - **Languages**: Supports only the 12 included languages
 - **Performance**: Large datasets (>100K rows) may require several seconds to process
 
+## Testing with Your Own Files
+
+To test the analyzer with your own files, simply add them to the `./analysis/` folder:
+
+1. Place your `.txt` or `.csv` files in the `analysis/` directory
+2. Run the program and select Option 1 (Load and analyze text file)
+3. Enter the filename when prompted
+4. Follow the on-screen instructions to select columns (for CSV) or view analysis
+
+The `analysis/` folder contains sample test files to get you started:
+- `test_hate_asian_1000.txt`
+- `test_hate_bisexual_1000.txt`
+- `test_hate_black_1000.txt`
+- `test_cyberbullying_1000.csv`
+- `test_youtoxic_english_1000.csv`
+- `test_general_data.txt`
+
 ## Troubleshooting
 
 ### "File not found" error
@@ -318,4 +335,4 @@ This program demonstrates:
 
 **Version**: 1.0  
 **Last Updated**: December 2025  
-**Course**: COMP1028 - Data Structures and Algorithms
+**Course**: COMP1028 - Programming and Algorithms (University of Nottingham Malaysia)
