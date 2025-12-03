@@ -456,17 +456,45 @@ void saveReportMenu(void) {
 
     // ===== TOP TOXIC WORDS =====
     fprintf(report, "--- Top 10 Toxic Words Detected ---\n");
-    int topCount = 0;
-    for (int i = 0; i < toxicCount && topCount < 10; i++) {
+    
+    // Create temporary array with frequency > 0
+    struct ToxicWordEntry {
+        char word[50];
+        int freq;
+        int severity;
+    } tempWords[toxicCount];
+    int tempCount = 0;
+    
+    for (int i = 0; i < toxicCount; i++) {
         if (toxicFreq[i] > 0) {
-            char severity[20];
-            if (toxicSeverity[i] == SEVERITY_MILD) strcpy(severity, "MILD");
-            else if (toxicSeverity[i] == SEVERITY_MODERATE) strcpy(severity, "MODERATE");
-            else strcpy(severity, "SEVERE");
-            
-            fprintf(report, "%d. %s (Freq: %d, Severity: %s)\n", topCount + 1, toxicWords[i], toxicFreq[i], severity);
-            topCount++;
+            strcpy(tempWords[tempCount].word, toxicWords[i]);
+            tempWords[tempCount].freq = toxicFreq[i];
+            tempWords[tempCount].severity = toxicSeverity[i];
+            tempCount++;
         }
+    }
+    
+    // Sort by frequency descending (bubble sort for simplicity)
+    for (int i = 0; i < tempCount - 1; i++) {
+        for (int j = 0; j < tempCount - i - 1; j++) {
+            if (tempWords[j].freq < tempWords[j + 1].freq) {
+                struct ToxicWordEntry temp = tempWords[j];
+                tempWords[j] = tempWords[j + 1];
+                tempWords[j + 1] = temp;
+            }
+        }
+    }
+    
+    // Display top 10
+    int topCount = 0;
+    for (int i = 0; i < tempCount && topCount < 10; i++) {
+        char severity[20];
+        if (tempWords[i].severity == SEVERITY_MILD) strcpy(severity, "MILD");
+        else if (tempWords[i].severity == SEVERITY_MODERATE) strcpy(severity, "MODERATE");
+        else strcpy(severity, "SEVERE");
+        
+        fprintf(report, "%d. %s (Freq: %d, Severity: %s)\n", topCount + 1, tempWords[i].word, tempWords[i].freq, severity);
+        topCount++;
     }
     if (topCount == 0) {
         fprintf(report, "No toxic words detected.\n");
@@ -558,19 +586,47 @@ void saveCSVReport(void) {
     // ===== TOP TOXIC WORDS =====
     fprintf(csv, "\nTOP TOXIC WORDS DETECTED\n");
     fprintf(csv, "Rank,Word,Frequency,Severity\n");
-    int topCount = 0;
-    for (int i = 0; i < toxicCount && topCount < 15; i++) {
+    
+    // Create temporary array with frequency > 0
+    struct ToxicWordEntry2 {
+        char word[50];
+        int freq;
+        int severity;
+    } tempWords2[toxicCount];
+    int tempCount2 = 0;
+    
+    for (int i = 0; i < toxicCount; i++) {
         if (toxicFreq[i] > 0) {
-            char severity[20];
-            if (toxicSeverity[i] == SEVERITY_MILD) strcpy(severity, "MILD");
-            else if (toxicSeverity[i] == SEVERITY_MODERATE) strcpy(severity, "MODERATE");
-            else strcpy(severity, "SEVERE");
-            
-            fprintf(csv, "%d,\"%s\",%d,%s\n", topCount + 1, toxicWords[i], toxicFreq[i], severity);
-            topCount++;
+            strcpy(tempWords2[tempCount2].word, toxicWords[i]);
+            tempWords2[tempCount2].freq = toxicFreq[i];
+            tempWords2[tempCount2].severity = toxicSeverity[i];
+            tempCount2++;
         }
     }
-    if (topCount == 0) {
+    
+    // Sort by frequency descending (bubble sort for simplicity)
+    for (int i = 0; i < tempCount2 - 1; i++) {
+        for (int j = 0; j < tempCount2 - i - 1; j++) {
+            if (tempWords2[j].freq < tempWords2[j + 1].freq) {
+                struct ToxicWordEntry2 temp = tempWords2[j];
+                tempWords2[j] = tempWords2[j + 1];
+                tempWords2[j + 1] = temp;
+            }
+        }
+    }
+    
+    // Display top 15
+    int topCount2 = 0;
+    for (int i = 0; i < tempCount2 && topCount2 < 15; i++) {
+        char severity[20];
+        if (tempWords2[i].severity == SEVERITY_MILD) strcpy(severity, "MILD");
+        else if (tempWords2[i].severity == SEVERITY_MODERATE) strcpy(severity, "MODERATE");
+        else strcpy(severity, "SEVERE");
+        
+        fprintf(csv, "%d,\"%s\",%d,%s\n", topCount2 + 1, tempWords2[i].word, tempWords2[i].freq, severity);
+        topCount2++;
+    }
+    if (topCount2 == 0) {
         fprintf(csv, "1,No toxic words detected,0,N/A\n");
     }
 
