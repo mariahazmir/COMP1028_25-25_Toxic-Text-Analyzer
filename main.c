@@ -534,7 +534,7 @@ void displaySortedWordsMenu(void) {
         printf("%s[DONE]%s Time: %s%.3f ms%s\n\n", SUCCESS, RESET, BRIGHT_BLUE, time_taken, RESET);
                
         printf("%s SORTED RESULTS (First 50 of %d)%s\n", MENU_LABEL, uniqueCount, RESET);
-        printf("%sâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€%s\n", DIVIDER, RESET);
+        printf("%s===================================================%s\n", DIVIDER, RESET);
 
         int displayLimit = (uniqueCount < 50) ? uniqueCount : 50;
         for (int i = 0; i < displayLimit; i++) {
@@ -545,7 +545,7 @@ void displaySortedWordsMenu(void) {
             printf("%s\n... and %d more words%s\n", INFO, uniqueCount - 50, RESET);
         }
 
-        printf("%sâ”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€%s\n", DIVIDER, RESET);
+        printf("%s===================================================%s\n", DIVIDER, RESET);
         printf("%sTOTAL: %d unique words sorted%s\n\n", SUCCESS, uniqueCount, RESET);
     }
     else if (criterionChoice == '2') {
