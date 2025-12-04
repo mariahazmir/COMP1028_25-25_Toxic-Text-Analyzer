@@ -128,6 +128,12 @@ void displayCSVHeaders(const char* filename) {
         return;
     }
     
+    // Remove UTF-8 BOM if present (EF BB BF)
+    unsigned char* line_ptr = (unsigned char*)line;
+    if (line[0] && line_ptr[0] == 0xEF && line_ptr[1] == 0xBB && line_ptr[2] == 0xBF) {
+        memmove(line, line + 3, strlen(line) - 2);
+    }
+    
     fclose(f);
     
     char fields[20][256];
@@ -135,9 +141,18 @@ void displayCSVHeaders(const char* filename) {
     
     printf("\nCSV Columns found:\n");
     for (int i = 0; i < colCount; i++) {
-        // Trim whitespace
+        // Trim whitespace and remove non-ASCII
         int start = 0;
         while (fields[i][start] == ' ') start++;
+        
+        char* field_ptr = (unsigned char*)&fields[i][start];
+        // Remove any non-ASCII characters
+        for (int j = 0; field_ptr[j]; j++) {
+            if ((unsigned char)field_ptr[j] > 127) {
+                field_ptr[j] = '?';
+            }
+        }
+        
         printf("  %d. %s\n", i + 1, &fields[i][start]);
     }
 }

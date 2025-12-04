@@ -18,6 +18,33 @@
 
 #include "data_types.h"
 
+// ============= Global Buffer for Merge Sort =============
+// Dynamic buffer allocated on-demand to avoid stack overflow
+static char (*mergeBuffer)[50] = NULL;
+static int mergeBufferSize = 0;
+
+// Initialize merge buffer on first use
+static void initMergeBuffer(int size) {
+    if (mergeBuffer == NULL || mergeBufferSize < size) {
+        if (mergeBuffer) free(mergeBuffer);
+        mergeBuffer = (char(*)[50])malloc(size * 50);
+        if (!mergeBuffer) {
+            fprintf(stderr, "ERROR: Cannot allocate merge buffer\n");
+            exit(1);
+        }
+        mergeBufferSize = size;
+    }
+}
+
+// Cleanup merge buffer (non-static so it can be called from main)
+void cleanupMergeBuffer(void) {
+    if (mergeBuffer) {
+        free(mergeBuffer);
+        mergeBuffer = NULL;
+        mergeBufferSize = 0;
+    }
+}
+
 // ============= Sorting Utility Functions =============
 
 void swapWords(char a[50], char b[50]) {
@@ -45,7 +72,9 @@ void bubbleSortWords(char words[][50], int count) {
 // ============= Quick Sort Implementation =============
 
 int partition(char words[][50], int low, int high) {
-    char* pivot = words[high];
+    // Store pivot value, not pointer (since array might move during swaps)
+    char pivot[50];
+    strcpy(pivot, words[high]);
     int i = low - 1;
     for (int j = low; j < high; j++) {
         if (strcmp(words[j], pivot) < 0) {
@@ -71,37 +100,40 @@ void mergeWords(char words[][50], int left, int mid, int right) {
     int i = left;
     int j = mid + 1;
     int k = 0;
-    int tempSize = right - left + 1;
+    int mergeSize = right - left + 1;
     
-    // Temporary array to hold merged data
-    char (*temp)[50] = malloc(tempSize * sizeof(char[50]));
-    if (!temp) return;
+    // Safety check
+    if (k >= mergeBufferSize || mergeSize > mergeBufferSize) {
+        fprintf(stderr, "ERROR: Merge buffer overflow! Size: %d, Buffer: %d\n", mergeSize, mergeBufferSize);
+        return;
+    }
+    
+    // Use pre-allocated global buffer instead of malloc
+    // to avoid allocation failures on large datasets
     
     // Merge the two sorted subarrays
     while (i <= mid && j <= right) {
         if (strcmp(words[i], words[j]) <= 0) {
-            strcpy(temp[k++], words[i++]);
+            strcpy(mergeBuffer[k++], words[i++]);
         } else {
-            strcpy(temp[k++], words[j++]);
+            strcpy(mergeBuffer[k++], words[j++]);
         }
     }
     
     // Copy remaining elements from left subarray
     while (i <= mid) {
-        strcpy(temp[k++], words[i++]);
+        strcpy(mergeBuffer[k++], words[i++]);
     }
     
     // Copy remaining elements from right subarray
     while (j <= right) {
-        strcpy(temp[k++], words[j++]);
+        strcpy(mergeBuffer[k++], words[j++]);
     }
     
     // Copy sorted elements back to original array
     for (int i = left, k = 0; i <= right; i++, k++) {
-        strcpy(words[i], temp[k]);
+        strcpy(words[i], mergeBuffer[k]);
     }
-    
-    free(temp);
 }
 
 void mergeSortWordsHelper(char words[][50], int left, int right) {
@@ -115,6 +147,7 @@ void mergeSortWordsHelper(char words[][50], int left, int right) {
 
 void mergeSortWords(char words[][50], int count) {
     if (count > 1) {
+        initMergeBuffer(count);
         mergeSortWordsHelper(words, 0, count - 1);
     }
 }

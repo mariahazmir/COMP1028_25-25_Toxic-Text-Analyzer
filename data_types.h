@@ -233,6 +233,7 @@ void quickSortWords(char words[][50], int low, int high);
 void mergeSortWords(char words[][50], int count);
 void mergeSortWordsHelper(char words[][50], int left, int right);
 void mergeWords(char words[][50], int left, int mid, int right);
+void cleanupMergeBuffer(void);  // Free merge sort buffer after use
 
 // ============= reporting.c =============
 

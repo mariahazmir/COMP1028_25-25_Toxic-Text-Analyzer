@@ -593,43 +593,87 @@ void compareSortingAlgorithms(void) {
     printf("          COMPARING SORTING ALGORITHMS\n");
     printf("====================================================\n");
     printf("Dataset size: %d UNIQUE words\n", uniqueCount);
+    
+    // For very large datasets, skip all sorting (avoid memory and stack issues)
+    if (uniqueCount > 2500) {
+        printf("\n%s[NOTICE] Dataset is very large (%d words).%s\n", ERROR, uniqueCount, RESET);
+        printf("%sSkipping all algorithm comparisons to prevent memory/stack overflow.%s\n\n", ERROR, RESET);
+        printf("ALGORITHM RECOMMENDATIONS:\n");
+        printf("  - Bubble Sort  : O(n^2)     - Too slow for large datasets\n");
+        printf("  - Quick Sort   : O(n log n) - May cause stack overflow\n");
+        printf("  - Merge Sort   : O(n log n) - BEST (stable, guaranteed performance)\n\n");
+        return;
+    }
+    
+    // For medium-large datasets, skip Bubble Sort and Quick Sort
+    if (uniqueCount > 2000) {
+        printf("%s[NOTICE] Dataset is large (%d words).%s\n", ERROR, uniqueCount, RESET);
+        printf("%sSkipping Bubble Sort and Quick Sort (performance/stability).%s\n", ERROR, RESET);
+        printf("%sRunning Merge Sort only...%s\n\n", SUCCESS, RESET);
+    }
 
-    // Allocate based on uniqueCount
-    char(*bubbleSorted)[50] = (char(*)[50])malloc(uniqueCount * 50 * sizeof(char));
-    char(*quickSorted)[50] = (char(*)[50])malloc(uniqueCount * 50 * sizeof(char));
-    char(*mergeSorted)[50] = (char(*)[50])malloc(uniqueCount * 50 * sizeof(char));
+    // Allocate based on uniqueCount - ensure sufficient memory
+    size_t allocSize = (size_t)uniqueCount * 50 * sizeof(char);
+    
+    char(*bubbleSorted)[50] = NULL;
+    char(*quickSorted)[50] = (char(*)[50])malloc(allocSize);
+    char(*mergeSorted)[50] = (char(*)[50])malloc(allocSize);
+    
+    // Only allocate bubble sort for datasets <= 2000 words
+    if (uniqueCount <= 2000) {
+        bubbleSorted = (char(*)[50])malloc(allocSize);
+    }
 
-    if (!bubbleSorted || !quickSorted || !mergeSorted) {
+    if ((!bubbleSorted && uniqueCount <= 2000) || !quickSorted || !mergeSorted) {
         printf("ERROR: Memory allocation failed!\n");
         if (bubbleSorted) free(bubbleSorted);
         if (quickSorted) free(quickSorted);
         if (mergeSorted) free(mergeSorted);
         return;
     }
-
-    // Copy UNIQUE words only
-    for (int i = 0; i < uniqueCount; i++) {
-        strcpy(bubbleSorted[i], uniqueWords[i]);
+    
+    // Copy words for bubble sort if allocated
+    if (bubbleSorted) {
+        for (int i = 0; i < uniqueCount; i++) {
+            strcpy(bubbleSorted[i], uniqueWords[i]);
+        }
+    }
+    
+    double bubbleTime = -1.0;  // -1 means skipped
+    
+    // Test Bubble Sort (only for smaller datasets)
+    if (bubbleSorted) {
+        printf("\nRunning Bubble Sort on %d unique words...\n", uniqueCount);
+        clock_t bubbleStart = clock();
+        bubbleSortWords(bubbleSorted, uniqueCount);
+        clock_t bubbleEnd = clock();
+        bubbleTime = ((double)(bubbleEnd - bubbleStart)) / CLOCKS_PER_SEC * 1000;
+        printf("Bubble Sort complete! Time: %.3f ms\n", bubbleTime);
+    } else {
+        printf("\nBubble Sort: SKIPPED (dataset too large)\n");
     }
 
-    printf("\nRunning Bubble Sort on %d unique words...\n", uniqueCount);
-    clock_t bubbleStart = clock();
-    bubbleSortWords(bubbleSorted, uniqueCount);
-    clock_t bubbleEnd = clock();
-    double bubbleTime = ((double)(bubbleEnd - bubbleStart)) / CLOCKS_PER_SEC * 1000;
-    printf("Bubble Sort complete! Time: %.3f ms\n", bubbleTime);
+    // Test Quick Sort (skip for very large datasets to avoid stack overflow)
+    double quickTime = -1.0;  // -1 means skipped
+    
+    if (uniqueCount <= 3000) {
+        for (int i = 0; i < uniqueCount; i++) {
+            strcpy(quickSorted[i], uniqueWords[i]);
+        }
 
-    // Test Quick Sort
-    for (int i = 0; i < uniqueCount; i++) {
-        strcpy(quickSorted[i], uniqueWords[i]);
+        printf("\nRunning Quick Sort on %d unique words...\n", uniqueCount);
+        clock_t quickStart = clock();
+        quickSortWords(quickSorted, 0, uniqueCount - 1);
+        clock_t quickEnd = clock();
+        quickTime = ((double)(quickEnd - quickStart)) / CLOCKS_PER_SEC * 1000;
+        printf("Quick Sort complete! Time: %.3f ms\n", quickTime);
+    } else {
+        printf("\nQuick Sort: SKIPPED (dataset too large - risk of stack overflow)\n");
+        // Still copy for merge sort comparison
+        for (int i = 0; i < uniqueCount; i++) {
+            strcpy(quickSorted[i], uniqueWords[i]);
+        }
     }
-
-    printf("\nRunning Quick Sort on %d unique words...\n", uniqueCount);
-    clock_t quickStart = clock();
-    quickSortWords(quickSorted, 0, uniqueCount - 1);
-    clock_t quickEnd = clock();
-    double quickTime = ((double)(quickEnd - quickStart)) / CLOCKS_PER_SEC * 1000;
-    printf("Quick Sort complete! Time: %.3f ms\n", quickTime);
 
     // Test Merge Sort
     for (int i = 0; i < uniqueCount; i++) {
@@ -643,13 +687,23 @@ void compareSortingAlgorithms(void) {
     double mergeTime = ((double)(mergeEnd - mergeStart)) / CLOCKS_PER_SEC * 1000;
     printf("Merge Sort complete! Time: %.3f ms\n", mergeTime);
 
-    // Verify all produce same result
+    // Verify all produce same result (only compare algorithms that ran)
     int match = 1;
-    for (int i = 0; i < uniqueCount; i++) {
-        if (strcmp(bubbleSorted[i], quickSorted[i]) != 0 || 
-            strcmp(bubbleSorted[i], mergeSorted[i]) != 0) {
-            match = 0;
-            break;
+    if (bubbleSorted) {
+        for (int i = 0; i < uniqueCount; i++) {
+            if (strcmp(bubbleSorted[i], quickSorted[i]) != 0 || 
+                strcmp(bubbleSorted[i], mergeSorted[i]) != 0) {
+                match = 0;
+                break;
+            }
+        }
+    } else {
+        // Compare Quick Sort and Merge Sort only
+        for (int i = 0; i < uniqueCount; i++) {
+            if (strcmp(quickSorted[i], mergeSorted[i]) != 0) {
+                match = 0;
+                break;
+            }
         }
     }
 
@@ -659,7 +713,11 @@ void compareSortingAlgorithms(void) {
 
     // Correctness check
     if (match) {
-        printf("\n[OK] All three algorithms produced IDENTICAL results!\n");
+        if (bubbleSorted) {
+            printf("\n[OK] All three algorithms produced IDENTICAL results!\n");
+        } else {
+            printf("\n[OK] Quick Sort and Merge Sort produced IDENTICAL results!\n");
+        }
     }
     else {
         printf("\n[WARNING] Results differ!\n");
@@ -667,18 +725,32 @@ void compareSortingAlgorithms(void) {
 
     // Performance comparison
     printf("\nPERFORMANCE METRICS:\n");
-    printf("  Bubble Sort: %.3f ms\n", bubbleTime);
-    printf("  Quick Sort:  %.3f ms\n", quickTime);
+    if (bubbleTime >= 0) {
+        printf("  Bubble Sort: %.3f ms\n", bubbleTime);
+    } else {
+        printf("  Bubble Sort: SKIPPED (dataset too large)\n");
+    }
+    if (quickTime >= 0) {
+        printf("  Quick Sort:  %.3f ms\n", quickTime);
+    } else {
+        printf("  Quick Sort:  SKIPPED (dataset too large - stack overflow risk)\n");
+    }
     printf("  Merge Sort:  %.3f ms\n", mergeTime);
 
-    // Find fastest
-    double fastest = bubbleTime;
-    const char *fastestName = "Bubble Sort";
+    // Find fastest (only compare algorithms that ran)
+    double fastest = 999999999.0;
+    const char *fastestName = "N/A";
     
-    if (quickTime < fastest) {
+    if (bubbleTime >= 0 && bubbleTime < fastest) {
+        fastest = bubbleTime;
+        fastestName = "Bubble Sort";
+    }
+    
+    if (quickTime >= 0 && quickTime < fastest) {
         fastest = quickTime;
         fastestName = "Quick Sort";
     }
+    
     if (mergeTime < fastest) {
         fastest = mergeTime;
         fastestName = "Merge Sort";
@@ -819,6 +891,7 @@ int main() {
         case '0':
             printf("\n%sThank you for using Toxic Text Analyzer!%s\n\n", SUCCESS, RESET);
             // Free allocated memory before exiting
+            cleanupMergeBuffer();
             free(words);
             free(uniqueWords);
             return 0;
