@@ -1,0 +1,40 @@
+========================================
+       TEXT ANALYSIS REPORT
+========================================
+
+--- General Statistics ---
+Total words: 11100
+Unique words: 3444
+Total sentences: 2205
+Average word length: 5.56
+Average sentence length: 5.03 words
+Lexical diversity index: 0.3103
+
+--- Toxicity Metrics ---
+Total toxic occurrences: 326
+Toxic ratio: 2.94%
+Non-toxic ratio: 97.06%
+
+--- Severity Breakdown ---
+SEVERE (Hate Speech & Slurs):
+  Occurrences: 100 | Unique words: 13
+MODERATE (Insults & Strong Language):
+  Occurrences: 224 | Unique words: 53
+MILD (Vulgar Language & Crude Terms):
+  Occurrences: 2 | Unique words: 1
+
+--- Top 10 Toxic Words Detected ---
+1. fuck (Freq: 42, Severity: SEVERE)
+2. shit (Freq: 41, Severity: MODERATE)
+3. stupid (Freq: 33, Severity: MODERATE)
+4. fucking (Freq: 26, Severity: SEVERE)
+5. ass (Freq: 19, Severity: MODERATE)
+6. bullshit (Freq: 14, Severity: MODERATE)
+7. idiot (Freq: 13, Severity: MODERATE)
+8. bitch (Freq: 10, Severity: MODERATE)
+9. idiots (Freq: 10, Severity: MODERATE)
+10. violent (Freq: 8, Severity: SEVERE)
+
+========================================
+Report generated successfully
+========================================

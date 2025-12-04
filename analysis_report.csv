@@ -1,0 +1,38 @@
+GENERAL STATISTICS
+Metric,Value
+Total Words,11100
+Unique Words,3444
+Total Sentences,2205
+Average Word Length,5.56
+Average Sentence Length (words),5.03
+Lexical Diversity Index,0.3103
+
+TOXICITY METRICS
+Metric,Value
+Total Toxic Occurrences,326
+Toxic Ratio (%),2.94
+Non-Toxic Ratio (%),97.06
+
+SEVERITY BREAKDOWN
+Severity Level,Occurrences,Unique Words
+SEVERE,"100","13"
+MODERATE,"224","53"
+MILD,"2","1"
+
+TOP TOXIC WORDS DETECTED
+Rank,Word,Frequency,Severity
+1,"fuck",42,SEVERE
+2,"shit",41,MODERATE
+3,"stupid",33,MODERATE
+4,"fucking",26,SEVERE
+5,"ass",19,MODERATE
+6,"bullshit",14,MODERATE
+7,"idiot",13,MODERATE
+8,"bitch",10,MODERATE
+9,"idiots",10,MODERATE
+10,"violent",8,SEVERE
+11,"fucks",7,SEVERE
+12,"damn",7,MODERATE
+13,"cunts",6,MODERATE
+14,"asses",5,MODERATE
+15,"moron",5,MODERATE
